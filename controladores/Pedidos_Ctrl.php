@@ -7,6 +7,8 @@ class Pedidos_Ctrl
     public $M_Datos_Envio = null;
     public $M_Propuesta = null;
     public $M_Proveedor = null;
+    public $M_Fotos = null;
+    public $server = 'http://192.168.100.19/api_repicar/';
 
 
     public function __construct()
@@ -16,6 +18,7 @@ class Pedidos_Ctrl
         $this->M_Datos_Envio = new M_Datos_Envio();
         $this->M_Propuesta = new M_Propuesta();
         $this->M_Proveedor = new M_Proveedor();
+        $this->M_Fotos = new M_Fotos();
     }
 
     public function registrar($f3)
@@ -37,7 +40,7 @@ class Pedidos_Ctrl
             $this->M_Pedidos->set('FECHA_INI', $f3->get('POST.fecha_ini'));
             $this->M_Pedidos->set('FECHA_FIN', $f3->get('POST.fecha_fin'));
             $this->M_Pedidos->save();
-
+        //Insertar datos de factura
             if($f3->get('POST.factura') == '1')
             {   
                 $this->M_Datos_Factura->set('ID_CLIENTE', $f3->get('POST.id_cliente'));
@@ -49,6 +52,7 @@ class Pedidos_Ctrl
                 $this->M_Datos_Factura->save();
                 
             }
+        //Insertar datos de envio
             if($f3->get('POST.servicio_env') == '1')
             {
                 $this->M_Datos_Envio->set('ID_CLIENTE', $f3->get('POST.id_cliente'));
@@ -58,7 +62,7 @@ class Pedidos_Ctrl
                 $this->M_Datos_Envio->set('REFERENCIA', $f3->get('POST.referencia'));
                 $this->M_Datos_Envio->save(); 
             }
-
+ //Creacion de Propuestas
             $result = $this->M_Proveedor->find(['ID_CIUDAD_F = ?', $f3->get('POST.id_ciudad')]);
             $items = array();
             $carros = ['auto','perro'];
@@ -82,7 +86,11 @@ class Pedidos_Ctrl
                $this->M_Propuesta->save(); 
 
           }
-
+        //Guadar fotos
+                
+                $this->M_Fotos->set('COD_PEDIDO', $f3->get('POST.cod_pedido'));
+                $this->M_Fotos->set('IMAGEN', $this->Guardar_Imagen($f3->get('POST.foto')));
+                $this->M_Fotos->save(); 
             
             echo json_encode([
                 'mensaje' => 'Pedido creado',
@@ -140,8 +148,8 @@ class Pedidos_Ctrl
             'info' => $info
         ]);
         
-    };
-    
+    }
+
     public function Guardar_Imagen($contenido)
     {
         $nombre_imagen = '';

@@ -3,7 +3,7 @@
 class Cliente_Ctrl
 {
     public $M_Cliente = null;
-
+    public $server = 'http://192.168.100.19/api_repicar/';
     public function __construct()
     {
         $this->M_Cliente = new M_Cliente();
@@ -18,7 +18,7 @@ class Cliente_Ctrl
             $this->M_Cliente->set('CELULAR', $f3->get('POST.celular'));
             $this->M_Cliente->set('CONTRASENIA', $f3->get('POST.contrasenia'));
             $this->M_Cliente->set('ESTADO', $f3->get('POST.estado'));
-            $this->M_Cliente->set('FOTO', $f3->get('POST.foto'));
+            $this->M_Cliente->set('FOTO', $this->Guardar_Imagen($f3->get('POST.foto')));
             $this->M_Cliente->save();
             echo json_encode([
                 'mensaje' => 'Cliente creado',
@@ -38,6 +38,7 @@ class Cliente_Ctrl
         {
             $msg = 'Cliente encontrado';
             $item = $this->M_Cliente->cast();
+            $item['FOTO'] = !empty($item['FOTO']) ? $this->server . $item['FOTO'] : 'http://via.placeholder.com/300x300';
         }else
         {
             $msg = 'El Cliente no existe';
@@ -61,7 +62,7 @@ class Cliente_Ctrl
         {
                 $this->M_Cliente->set('NOMBRES', $f3->get('POST.nombres'));
                 $this->M_Cliente->set('APELLIDOS', $f3->get('POST.apellidos'));
-                $this->M_Cliente->set('FOTO', $f3->get('POST.imagen'));
+                $this->M_Cliente->set('FOTO', $this->Guardar_Imagen($f3->get('POST.foto')));
                 $this->M_Cliente->save();
                 $msg = 'Cliente fue actualizado';
                 $info['id'] = $this->M_Cliente->get('ID_CLIENTE');
@@ -75,6 +76,20 @@ class Cliente_Ctrl
             'mensaje' => $msg,           
             'info' => $info
         ]);
+        
+    }
+    public function Guardar_Imagen($contenido)
+    {
+        $nombre_imagen = '';
+        if(!empty($contenido))
+        {
+            $contenido = explode('base64',$contenido);
+            $imagen = $contenido[1];
+            $nombre_imagen = 'imagenes/'. time().'.jpg';
+            file_put_contents($nombre_imagen,base64_decode($imagen));
+        }
+
+        return $nombre_imagen;
         
     }
 }
