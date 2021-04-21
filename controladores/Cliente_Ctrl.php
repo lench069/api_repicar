@@ -62,7 +62,10 @@ class Cliente_Ctrl
         {
                 $this->M_Cliente->set('NOMBRES', $f3->get('POST.nombres'));
                 $this->M_Cliente->set('APELLIDOS', $f3->get('POST.apellidos'));
-                $this->M_Cliente->set('FOTO', $this->Guardar_Imagen($f3->get('POST.foto')));
+                if($f3->get('POST.foto') <> 'false')
+                {
+                    $this->M_Cliente->set('FOTO', $this->Guardar_Imagen($f3->get('POST.foto')));
+                }
                 $this->M_Cliente->save();
                 $msg = 'Cliente fue actualizado';
                 $info['id'] = $this->M_Cliente->get('ID_CLIENTE');
@@ -90,6 +93,37 @@ class Cliente_Ctrl
         }
 
         return $nombre_imagen;
+        
+    }
+    public function login($f3)
+    {
+        $this->M_Cliente->load(['EMAIL = ?',$f3->get('POST.email')]);
+       
+        $msg='';
+        $item = array();
+        if($this->M_Cliente->loaded() > 0)
+        {
+            $this->M_Cliente->load(['CONTRASENIA = ? AND EMAIL = ?',$f3->get('POST.contrasenia'), $f3->get('POST.email')]);
+            
+            if($this->M_Cliente->loaded() > 0)
+            {
+                $msg = 'true';
+                $item = $this->M_Cliente->cast();
+            }else{
+                $msg = 'Contraseña incorrecta';
+            }
+   
+        }else
+        {
+            $msg = 'Email no existe';
+
+        }
+        echo json_encode([
+            'mensaje' => $msg,
+            'info' =>[
+                'item'=>$item
+            ]
+        ]);
         
     }
 }
