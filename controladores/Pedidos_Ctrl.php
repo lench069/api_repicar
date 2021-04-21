@@ -9,21 +9,25 @@ class Pedidos_Ctrl
     public $M_Proveedor = null;
     public $M_Fotos = null;
     public $server = 'http://192.168.100.19/api_repicar/';
+    public $time;
+    
 
 
     public function __construct()
     {
+
         $this->M_Pedidos = new M_Pedidos();
         $this->M_Datos_Factura = new M_Datos_Factura();
         $this->M_Datos_Envio = new M_Datos_Envio();
         $this->M_Propuesta = new M_Propuesta();
         $this->M_Proveedor = new M_Proveedor();
         $this->M_Fotos = new M_Fotos();
+        $this->fecha_ini = date('Y-m-d H:i:s');
     }
 
     public function registrar($f3)
     {
-       
+            
             $this->M_Pedidos->set('COD_PEDIDO', $f3->get('POST.cod_pedido'));
             $this->M_Pedidos->set('ID_CLIENTE', $f3->get('POST.id_cliente'));
             $this->M_Pedidos->set('ID_CIUDAD', $f3->get('POST.id_ciudad'));
@@ -37,7 +41,7 @@ class Pedidos_Ctrl
             $this->M_Pedidos->set('FACTURA', $f3->get('POST.factura'));
             $this->M_Pedidos->set('SERVICIO_ENV', $f3->get('POST.servicio_env'));
             $this->M_Pedidos->set('ESTADO', $f3->get('POST.estado'));
-            $this->M_Pedidos->set('FECHA_INI', $f3->get('POST.fecha_ini'));
+            $this->M_Pedidos->set('FECHA_INI', $this->fecha_ini);
             $this->M_Pedidos->set('FECHA_FIN', $f3->get('POST.fecha_fin'));
             $this->M_Pedidos->save();
         //Insertar datos de factura
@@ -82,7 +86,7 @@ class Pedidos_Ctrl
                $this->M_Propuesta->set('ENVIO', 0);
                $this->M_Propuesta->set('ESTADO', 'Creado');
                $this->M_Propuesta->set('NOTIFICACION', '');
-               $this->M_Propuesta->set('FECHA_INI','2021-04-19');
+               $this->M_Propuesta->set('FECHA_INI',$this->fecha_ini);
                $this->M_Propuesta->save(); 
 
           }

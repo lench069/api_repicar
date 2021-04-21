@@ -5,6 +5,8 @@ header('Content-type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+//Zona Horaria del servidor
+ini_set("date.timezone", "America/Bogota");
 // Kickstart the framework
 $f3=require('lib/base.php');
 
