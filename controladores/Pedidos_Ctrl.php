@@ -168,4 +168,54 @@ class Pedidos_Ctrl
         return $nombre_imagen;
         
     }
+    public function Listar_Pedidos($f3)
+    {
+        $db_host="localhost";
+        $db_user="root";
+        $db_password="";
+        $db_name="repicar";
+        
+        // Create connection
+        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
+    
+        mysqli_set_charset($db_connection, 'utf8');
+        
+        // Check connection
+        if ($db_connection->connect_error) {
+        die("Connection failed: " . $db_connection->connect_error);
+        }
+
+        $sql = "SELECT SUBSTRING(`FECHA_INI`,1,10) as FECHA_INICIAL,COUNT(`FECHA_INI`) as num
+        FROM `pedidos` where `ID_CLIENTE` =". $f3->get('POST.id_cliente')." GROUP by FECHA_INICIAL ORDER by `FECHA_INI` desc";
+        $resultado = mysqli_query($db_connection, $sql);
+        $fecha = '';
+        $pedidos = array();
+        $total = array();
+        while($row1 = mysqli_fetch_array($resultado)){
+            //echo $row1['FECHA_INICIAL'];
+            $pedidos= [];
+           $fecha = $row1['FECHA_INICIAL'];
+           $cantidad = $row1['num'];
+           $sql = "SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.`ORIGINAL`,p.`GENERICO`,
+           p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV,
+           m.DESCRIPCION as DES_MODELO,ma.DESCRIPCION as DES_MARCA,tv.DESCRIPCION as DES_TIPOV 
+           FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
+           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA INNER JOIN modelo as m ON m.ID_MODELO=p.modelo 
+           INNER JOIN marca as ma ON ma.ID_MARCA=m.ID_MARCA INNER JOIN tipo_vehiculo as tv ON 
+           tv.ID_TIPOV=ma.ID_TIPOV WHERE `FECHA_INI` LIKE '".$fecha."%' and `ID_CLIENTE` =". $f3->get('POST.id_cliente');
+           //echo $sql;
+            $resultado1 = mysqli_query($db_connection, $sql);
+            $row2= array();
+            while($row2 = mysqli_fetch_array($resultado1)){
+               // echo $row2;
+                $pedidos[] = $row2;
+                
+            }
+            array_push($total,array('fecha' => $fecha,'cantidad' => $cantidad, 'items' =>$pedidos) );
+        
+        };
+        echo json_encode($total);
+    }
+
+
 }

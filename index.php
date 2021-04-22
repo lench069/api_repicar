@@ -27,6 +27,7 @@ $f3->set('DB', new DB\SQL('mysql:host='.$f3->get('database.host').';port=3306;db
     \PDO::ATTR_PERSISTENT => TRUE, 
     \PDO::MYSQL_ATTR_COMPRESS => TRUE, 
 )));
+
 /*
 //verificacion de la conexion a la base de datos
 echo "<pre>";
