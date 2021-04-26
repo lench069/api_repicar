@@ -11,7 +11,7 @@ class Cliente_Ctrl
 
     public function registrar($f3)
     {
-       
+            
             $this->M_Cliente->set('NOMBRES', $f3->get('POST.nombres'));
             $this->M_Cliente->set('APELLIDOS', $f3->get('POST.apellidos'));
             $this->M_Cliente->set('EMAIL', $f3->get('POST.email'));

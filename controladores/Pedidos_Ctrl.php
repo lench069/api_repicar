@@ -91,11 +91,47 @@ class Pedidos_Ctrl
 
           }
         //Guadar fotos
-                
+      
+        if($f3->get('POST.foto[2]') <> '')
+        {
+            for ($i = 0; $i<=2;$i++)
+            {
+               
+                $this->M_Fotos->reset();
                 $this->M_Fotos->set('COD_PEDIDO', $f3->get('POST.cod_pedido'));
-                $this->M_Fotos->set('IMAGEN', $this->Guardar_Imagen($f3->get('POST.foto')));
-                $this->M_Fotos->save(); 
+                
+                $this->M_Fotos->set('IMAGEN', $this->Guardar_Imagen($f3->get('POST.foto['.$i.']')));
+                $this->M_Fotos->save();
+            }
+        }
+        elseif($f3->get('POST.foto[1]') <> '')
+        {
+            for ($i = 0; $i<=1;$i++)
+            {
+                
+                $this->M_Fotos->reset();
+                $this->M_Fotos->set('COD_PEDIDO', $f3->get('POST.cod_pedido'));
+                
+                $this->M_Fotos->set('IMAGEN', $this->Guardar_Imagen($f3->get('POST.foto['.$i.']')));
+                $this->M_Fotos->save();
+            }
+        }
+        elseif($f3->get('POST.foto[0]') <> '')
+        {
+            for ($i = 0; $i<=0;$i++)
+            {
+               
+                $this->M_Fotos->reset();
+                $this->M_Fotos->set('COD_PEDIDO', $f3->get('POST.cod_pedido'));
+                
+                $this->M_Fotos->set('IMAGEN', $this->Guardar_Imagen($f3->get('POST.foto['.$i.']')));
+                $this->M_Fotos->save();
+            }
+        }elseif($f3->get('POST.foto[0]') == '')
+        {
             
+        }
+        // respuesta al front
             echo json_encode([
                 'mensaje' => 'Pedido creado',
                 'info' =>[
@@ -156,12 +192,13 @@ class Pedidos_Ctrl
 
     public function Guardar_Imagen($contenido)
     {
+        $tiempo = time() + rand();
         $nombre_imagen = '';
         if(!empty($contenido))
         {
             $contenido = explode('base64',$contenido);
             $imagen = $contenido[1];
-            $nombre_imagen = 'imagenes/'. time().'.jpg';
+            $nombre_imagen = 'imagenes/'.$tiempo.'.jpg';
             file_put_contents($nombre_imagen,base64_decode($imagen));
         }
 
