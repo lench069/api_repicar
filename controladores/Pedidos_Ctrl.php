@@ -140,29 +140,7 @@ class Pedidos_Ctrl
             ]);
             
     }
-    public function consultar($f3)
-    {
-        $id_cliente = $f3->get('PARAMS.id_cliente');
-        $this->M_Pedidos->load(['ID_CLIENTE = ?',$id_cliente]);
-        $msg='';
-        $item = array();
-        if($this->M_Pedidos->loaded() > 0)
-        {
-            $msg = 'Cliente encontrado';
-            $item = $this->M_Pedidos->cast();
-        }else
-        {
-            $msg = 'El Cliente no existe';
 
-        }
-        echo json_encode([
-            'mensaje' => $msg,
-            'info' =>[
-                'item'=>$item
-            ]
-        ]);
-        
-    }
     public function actualizar_cuenta($f3)
     {
         $id_cliente = $f3->get('PARAMS.id_cliente');
@@ -233,14 +211,12 @@ class Pedidos_Ctrl
             $pedidos= [];
            $fecha = $row1['FECHA_INICIAL'];
            $cantidad = $row1['num'];
-           $sql = "SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.`ORIGINAL`,p.`GENERICO`,
-           p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV,
-           m.DESCRIPCION as DES_MODELO,ma.DESCRIPCION as DES_MARCA,tv.DESCRIPCION as DES_TIPOV 
+           $sql = "SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
+           p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV 
            FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
-           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA INNER JOIN modelo as m ON m.ID_MODELO=p.modelo 
-           INNER JOIN marca as ma ON ma.ID_MARCA=m.ID_MARCA INNER JOIN tipo_vehiculo as tv ON 
-           tv.ID_TIPOV=ma.ID_TIPOV WHERE `FECHA_INI` LIKE '".$fecha."%' and `ID_CLIENTE` =". $f3->get('POST.id_cliente');
+           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and `ID_CLIENTE` =". $f3->get('POST.id_cliente');
            //echo $sql;
+
             $resultado1 = mysqli_query($db_connection, $sql);
             $row2= array();
             while($row2 = mysqli_fetch_array($resultado1)){
@@ -252,6 +228,67 @@ class Pedidos_Ctrl
         
         };
         echo json_encode($total);
+    }
+
+    public function consultar($f3)
+    {
+        $db_host="localhost";
+        $db_user="root";
+        $db_password="";
+        $db_name="repicar";
+        
+        // Create connection
+        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
+    
+        mysqli_set_charset($db_connection, 'utf8');
+        
+        // Check connection
+        if ($db_connection->connect_error) {
+        die("Connection failed: " . $db_connection->connect_error);
+        }
+
+        $sql = "SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
+        p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV 
+        FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
+        as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE  `COD_PEDIDO` ="."'".$f3->get('PARAMS.cod_pedido')."'";
+        $resultado = mysqli_query($db_connection, $sql);
+
+        $pedido = array();
+        $propuesta = array();
+        if ($resultado->num_rows > 0) {
+            $msg = 'Pedido encontrado';
+             // output data of each row
+            $pedido = mysqli_fetch_assoc($resultado);
+
+            $sql = "SELECT pro.CI_RUC,pro.COD_PEDIDO,pro.P_ORIGINAL,pro.P_GENERICO,pro.FACTURA,pro.ENVIO,
+            pro.ESTADO,pro.NOTIFICACION,pro.ID_PROPUESTA,pro.FECHA_INI,prove.NOMBRES as NOMBRE_PROVEE,
+            prove.APELLIDOS as APELLIDOS_PROVEE,prove.NOMBRE_LOCAL,prove.DIRECCION,prove.SECTOR, 
+            c.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVIN FROM `propuesta` as pro INNER JOIN 
+            proveedor as prove on pro.`CI_RUC` = prove.CI_RUC INNER JOIN ciudad as c on 
+            prove.ID_CIUDAD_F=c.ID_CIUDAD INNER JOIN provincia as provin ON c.ID_PROVINCIA=provin.ID_PROVINCIA
+             WHERE `COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'";
+            $result = mysqli_query($db_connection, $sql);
+            if ($result->num_rows > 0) {
+                while($row = mysqli_fetch_array($result)){
+                    // echo $row2;
+                     $propuesta[] = $row;  
+                 }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene propuestas';
+            }
+
+        }else{
+            $msg = 'Pedido no exites';
+        }
+
+        echo json_encode([
+            'mensaje' => $msg,
+           
+                'pedido' => $pedido,
+                'propuestas' => $propuesta
+
+        ]);
+        
     }
 
 
