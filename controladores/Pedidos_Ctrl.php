@@ -291,5 +291,41 @@ class Pedidos_Ctrl
         
     }
 
+    public function Listar_Pedidos_Nuevos($f3)
+    {
+        $db_host="localhost";
+        $db_user="root";
+        $db_password="";
+        $db_name="repicar";
+        
+        // Create connection
+        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
+    
+        mysqli_set_charset($db_connection, 'utf8');
+        
+        // Check connection
+        if ($db_connection->connect_error) {
+        die("Connection failed: " . $db_connection->connect_error);
+        }
+
+        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
+         propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
+         propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
+         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
+         '0604262956' and pe.ESTADO = 'Creado' order by pe.FECHA_INI DESC";
+        $resultado = mysqli_query($db_connection, $sql);
+        $pedidos_nuevos = array();
+            $row= array();
+            while($row = mysqli_fetch_array($resultado)){
+          
+                $pedidos_nuevos[] = $row;  
+            }
+            
+
+        echo json_encode($pedidos_nuevos);
+    }
+
 
 }

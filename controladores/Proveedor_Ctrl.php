@@ -31,5 +31,44 @@ class Proveedor_Ctrl
             ]);
             
     }
+
+    public function login($f3)
+    {
+        $this->M_Proveedor->load(['CI_RUC = ?',$f3->get('POST.ci_ruc')]);
+      
+       /* echo "<pre>";
+        print_r($this->M_Proveedor);
+        echo "</pre>";*/
+        $msg='';
+        $item = array();
+        if($this->M_Proveedor->loaded() > 0)
+        {
+            $this->M_Proveedor->load(['CONTRASENIA = ? AND CI_RUC = ?',$f3->get('POST.contrasenia'), $f3->get('POST.ci_ruc')]);
+            
+            if($this->M_Proveedor->loaded() > 0)
+            {
+                $msg = 'true';
+                $item = $this->M_Proveedor->cast();
+            }else{
+                $msg = 'Contraseña incorrecta';
+            }
+   
+        }else
+        {
+            $msg = 'Usuario no existe';
+
+        }
+        echo json_encode([
+            'mensaje' => $msg,
+            'info' =>[
+                'item'=>$item
+            ]
+        ]);
+        
+    }
+
+    
+
+
    
 }
