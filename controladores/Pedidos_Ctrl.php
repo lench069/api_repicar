@@ -23,6 +23,7 @@ class Pedidos_Ctrl
         $this->M_Proveedor = new M_Proveedor();
         $this->M_Fotos = new M_Fotos();
         $this->fecha_ini = date('Y-m-d H:i:s');
+        $this->fecha_fin = date('Y-m-d H:i:s');
     }
 
     public function registrar($f3)
@@ -262,11 +263,12 @@ class Pedidos_Ctrl
 
             $sql = "SELECT pro.CI_RUC,pro.COD_PEDIDO,pro.P_ORIGINAL,pro.P_GENERICO,pro.FACTURA,pro.ENVIO,
             pro.ESTADO,pro.NOTIFICACION,pro.ID_PROPUESTA,pro.FECHA_INI,prove.NOMBRES as NOMBRE_PROVEE,
-            prove.APELLIDOS as APELLIDOS_PROVEE,prove.NOMBRE_LOCAL,prove.DIRECCION,prove.SECTOR, 
+            prove.NOMBRE_LOCAL,prove.DIRECCION,prove.SECTOR, 
             c.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVIN FROM `propuesta` as pro INNER JOIN 
             proveedor as prove on pro.`CI_RUC` = prove.CI_RUC INNER JOIN ciudad as c on 
             prove.ID_CIUDAD_F=c.ID_CIUDAD INNER JOIN provincia as provin ON c.ID_PROVINCIA=provin.ID_PROVINCIA
-             WHERE `COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'";
+             WHERE `COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'"."and pro.ESTADO='Cotizado'";
+           
             $result = mysqli_query($db_connection, $sql);
             if ($result->num_rows > 0) {
                 while($row = mysqli_fetch_array($result)){
@@ -308,23 +310,43 @@ class Pedidos_Ctrl
         die("Connection failed: " . $db_connection->connect_error);
         }
 
-        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
         pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
         ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
-         '0604262956' and pe.ESTADO = 'Creado' order by pe.FECHA_INI DESC";
+         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' order by pe.FECHA_INI DESC";
         $resultado = mysqli_query($db_connection, $sql);
-        $pedidos_nuevos = array();
-            $row= array();
-            while($row = mysqli_fetch_array($resultado)){
+        $pedidos = array();
+        $fotos = array();
+        $respuesta = array();
+        while($row = mysqli_fetch_array($resultado)){
           
-                $pedidos_nuevos[] = $row;  
-            }
             
+            $pedidos[] = $row; 
 
-        echo json_encode($pedidos_nuevos);
+            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
+            
+            $result = mysqli_query($db_connection, $sql);
+            if ($result->num_rows > 0) {
+                while($row1 = mysqli_fetch_array($result)){
+                    // echo $row2;                   
+                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
+                     $fotos[] = $row1;  
+                    }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene fotos';
+            }
+            //array_push($row,array('fotos' => $fotos) );
+            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
+            $pedidos = [];
+            $fotos=[];
+            
+        }
+        echo json_encode($respuesta);
+      
+       
     }
 
 
