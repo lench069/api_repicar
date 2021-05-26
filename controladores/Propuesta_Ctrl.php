@@ -51,4 +51,31 @@ class Propuesta_Ctrl
         ]);
         
     }
+
+    public function cliente_acepta_propuesta($f3)
+    {
+      
+        $id_propuesta = $f3->get('PARAMS.id_propuesta');
+        $this->M_Propuesta->load(['ID_PROPUESTA = ?',$id_propuesta]);
+        $msg='';
+        $info = array();
+        if($this->M_Propuesta->loaded() > 0)
+        {
+               $this->M_Propuesta->set('ESTADO', $f3->get('POST.estado'));
+                $this->M_Propuesta->set('FECHA_FIN', $this->fecha_fin);  
+                $this->M_Propuesta->save();
+                $msg = 'Propuesta fue aceptada';
+                $info['id'] = $this->M_Propuesta->get('ID_PROPUESTA');
+        }else
+        {
+            $msg = 'La propuesta no existe';
+            $info['id'] = 0;
+
+        }
+        echo json_encode([
+            'mensaje' => $msg,           
+            'info' => $info
+        ]);
+        
+    }
 }
