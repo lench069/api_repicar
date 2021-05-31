@@ -207,6 +207,7 @@ class Pedidos_Ctrl
         $fecha = '';
         $pedidos = array();
         $total = array();
+        
         while($row1 = mysqli_fetch_array($resultado)){
             //echo $row1['FECHA_INICIAL'];
             $pedidos= [];
@@ -215,8 +216,8 @@ class Pedidos_Ctrl
            $sql = "SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
            p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV 
            FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
-           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and `ID_CLIENTE` =". $f3->get('POST.id_cliente');
-           //echo $sql;
+           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and `ESTADO`='Creado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente');
+           
 
             $resultado1 = mysqli_query($db_connection, $sql);
             $row2= array();
@@ -421,6 +422,7 @@ class Pedidos_Ctrl
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
          "."'".$f3->get('POST.id_proveedor')."'"." and (propues.ESTADO = 'Cotizado' or propues.ESTADO='Aceptado') and propues.ACEPT=0 order by pe.FECHA_INI DESC";
+       
         $resultado = mysqli_query($db_connection, $sql);
         $pedidos = array();
         while($row = mysqli_fetch_array($resultado)){
@@ -494,8 +496,11 @@ class Pedidos_Ctrl
         $resultado = mysqli_query($db_connection, $sql);
         $fila= mysqli_fetch_array ($resultado);
         if ($resultado->num_rows > 0) {
-            
-            $sql1="UPDATE `propuesta` SET `ACEPT`=1,`FECHA_FIN`=".'"'.$this->fecha_fin.'"'." WHERE `ID_PROPUESTA`=".$fila["ID_PROPUESTA"];
+           
+            $sql0="UPDATE `propuesta` SET `ESTADO`='Eliminado' WHERE `COD_PEDIDO`=".'"'.$fila["COD_PEDIDO"].'"';
+            $resultado0 = mysqli_query($db_connection, $sql0);
+           
+            $sql1="UPDATE `propuesta` SET `ESTADO`='Aceptado',`ACEPT`=1,`FECHA_FIN`=".'"'.$this->fecha_fin.'"'." WHERE `ID_PROPUESTA`=".$fila["ID_PROPUESTA"];
             $resultado1 = mysqli_query($db_connection, $sql1);
             $sql2="UPDATE `pedidos` SET `ESTADO`='Finalizado',`FECHA_FIN`=".'"'.$this->fecha_fin.'"'." WHERE `COD_PEDIDO`=".'"'.$fila["COD_PEDIDO"].'"';
             $resultado2 = mysqli_query($db_connection, $sql2);
