@@ -12,7 +12,7 @@ class Propuesta_Ctrl
 
     public function cotizar_propuesta($f3)
     {
-      
+       
         $id_propuesta = $f3->get('PARAMS.id_propuesta');
         $this->M_Propuesta->load(['ID_PROPUESTA = ?',$id_propuesta]);
         $msg='';
@@ -22,6 +22,9 @@ class Propuesta_Ctrl
                $this->M_Propuesta->set('ESTADO', $f3->get('POST.estado'));
                 $this->M_Propuesta->set('P_ORIGINAL', $f3->get('POST.p_original'));
                 $this->M_Propuesta->set('P_GENERICO', $f3->get('POST.p_generico'));  
+                $this->M_Propuesta->set('P_ENVIO', $f3->get('POST.p_envio'));  
+                $this->M_Propuesta->set('P_ORIGINAL_COM', $f3->get('POST.p_original_com'));  
+                $this->M_Propuesta->set('P_GENERICO_COM', $f3->get('POST.p_generico_com'));  
                 if($f3->get('POST.factura') == 'true')
                 {
                     $this->M_Propuesta->set('FACTURA', true);

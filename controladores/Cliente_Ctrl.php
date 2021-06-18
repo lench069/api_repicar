@@ -3,7 +3,7 @@
 class Cliente_Ctrl
 {
     public $M_Cliente = null;
-    public $server = 'http://192.168.100.19/api_repicar/';
+    public $server = 'http://192.168.100.19:8080/api_repicar/';
     public function __construct()
     {
         $this->M_Cliente = new M_Cliente();
