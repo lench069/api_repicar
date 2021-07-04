@@ -83,6 +83,9 @@ class Pedidos_Ctrl
                $this->M_Propuesta->set('COD_PEDIDO', $f3->get('POST.cod_pedido'));
                $this->M_Propuesta->set('P_ORIGINAL', 0);
                $this->M_Propuesta->set('P_GENERICO', 0);
+               $this->M_Propuesta->set('P_ORIGINAL_COM', 0);
+               $this->M_Propuesta->set('P_GENERICO_COM', 0);
+               $this->M_Propuesta->set('P_ENVIO', 0);
                $this->M_Propuesta->set('FACTURA', 0);
                $this->M_Propuesta->set('ENVIO', 0);
                $this->M_Propuesta->set('ESTADO', 'Creado');
@@ -398,7 +401,7 @@ class Pedidos_Ctrl
        
     }
 
-    public function Listar_Pedidos_Enviados($f3)
+    public function Listar_Pedidos_Nuevos_PorTipoV($f3)
     {
         $db_host="localhost";
         $db_user="root";
@@ -421,18 +424,207 @@ class Pedidos_Ctrl
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
-         "."'".$f3->get('POST.id_proveedor')."'"." and (propues.ESTADO = 'Cotizado' or propues.ESTADO='Aceptado') and propues.ACEPT=0 order by pe.FECHA_INI DESC";
-       
+         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' and pe.`TIPO_VEHICULO` = "."'".$f3->get('POST.detalle_tipov')."'"."  order by pe.FECHA_INI DESC";
         $resultado = mysqli_query($db_connection, $sql);
         $pedidos = array();
+        $fotos = array();
+        $respuesta = array();
         while($row = mysqli_fetch_array($resultado)){
-                
+          
+            
             $pedidos[] = $row; 
+
+            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
+            
+            $result = mysqli_query($db_connection, $sql);
+            if ($result->num_rows > 0) {
+                while($row1 = mysqli_fetch_array($result)){
+                    // echo $row2;                   
+                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
+                     $fotos[] = $row1;  
+                    }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene fotos';
+            }
+            //array_push($row,array('fotos' => $fotos) );
+            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
+            $pedidos = [];
+            $fotos=[];
             
         }
-        echo json_encode($pedidos);
+        echo json_encode($respuesta);
       
        
+    }
+
+    public function Listar_Pedidos_Nuevos_PorMarca($f3)
+    {
+        $db_host="localhost";
+        $db_user="root";
+        $db_password="";
+        $db_name="repicar";
+        
+        // Create connection
+        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
+    
+        mysqli_set_charset($db_connection, 'utf8');
+        
+        // Check connection
+        if ($db_connection->connect_error) {
+        die("Connection failed: " . $db_connection->connect_error);
+        }
+
+        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
+         propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
+         propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
+         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
+         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' and pe.`TIPO_VEHICULO` = "."'".$f3->get('POST.detalle_tipov')."'"." and pe.`MARCA` = "."'".$f3->get('POST.detalle_marca')."'"."  order by pe.FECHA_INI DESC";
+        $resultado = mysqli_query($db_connection, $sql);
+        $pedidos = array();
+        $fotos = array();
+        $respuesta = array();
+        while($row = mysqli_fetch_array($resultado)){
+          
+            
+            $pedidos[] = $row; 
+
+            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
+            
+            $result = mysqli_query($db_connection, $sql);
+            if ($result->num_rows > 0) {
+                while($row1 = mysqli_fetch_array($result)){
+                    // echo $row2;                   
+                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
+                     $fotos[] = $row1;  
+                    }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene fotos';
+            }
+            //array_push($row,array('fotos' => $fotos) );
+            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
+            $pedidos = [];
+            $fotos=[];
+            
+        }
+        echo json_encode($respuesta);
+      
+       
+    }
+
+    public function Listar_Pedidos_Nuevos_PorTermino($f3)
+    {
+        $db_host="localhost";
+        $db_user="root";
+        $db_password="";
+        $db_name="repicar";
+        
+        // Create connection
+        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
+    
+        mysqli_set_charset($db_connection, 'utf8');
+        
+        // Check connection
+        if ($db_connection->connect_error) {
+        die("Connection failed: " . $db_connection->connect_error);
+        }
+
+        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
+         propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
+         propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
+         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
+         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' and (pe.`TIPO_VEHICULO` like "."'%".$f3->get('POST.termino')."%'"." 
+         || pe.`MARCA` like "."'%".$f3->get('POST.termino')."%'"." || pe.`DESCRIPCION` like "."'%".$f3->get('POST.termino')."%'"." || pe.`ANIO` like "."'%".$f3->get('POST.termino')."%'".") order by pe.FECHA_INI DESC";
+     
+        $resultado = mysqli_query($db_connection, $sql);
+        $pedidos = array();
+        $fotos = array();
+        $respuesta = array();
+        while($row = mysqli_fetch_array($resultado)){
+          
+            
+            $pedidos[] = $row; 
+
+            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
+            
+            $result = mysqli_query($db_connection, $sql);
+            if ($result->num_rows > 0) {
+                while($row1 = mysqli_fetch_array($result)){
+                    // echo $row2;                   
+                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
+                     $fotos[] = $row1;  
+                    }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene fotos';
+            }
+            //array_push($row,array('fotos' => $fotos) );
+            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
+            $pedidos = [];
+            $fotos=[];
+            
+        }
+        echo json_encode($respuesta);
+      
+       
+    }
+
+    public function Listar_Pedidos_Enviados($f3)
+    {
+        $db_host="localhost";
+        $db_user="root";
+        $db_password="";
+        $db_name="repicar";
+        
+        // Create connection
+        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
+    
+        mysqli_set_charset($db_connection, 'utf8');
+        
+        // Check connection
+        if ($db_connection->connect_error) {
+        die("Connection failed: " . $db_connection->connect_error);
+        }
+        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA,propues.P_ORIGINAL,propues.P_ORIGINAL_COM,
+        propues.P_GENERICO,propues.P_GENERICO_COM,propues.P_ENVIO,propues.FACTURA as FAC_PROPUESTA,propues.ENVIO 
+        as ENV_PROPUESTA,pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
+         propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
+         propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
+         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
+         "."'".$f3->get('POST.id_proveedor')."'"." and (propues.ESTADO = 'Cotizado' or propues.ESTADO='Aceptado') and propues.ACEPT=0 order by pe.FECHA_INI DESC";
+        $resultado = mysqli_query($db_connection, $sql);
+        $pedidos = array();
+        $fotos = array();
+        $respuesta = array();
+        while($row = mysqli_fetch_array($resultado)){
+          
+            
+            $pedidos[] = $row; 
+
+            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
+            
+            $result = mysqli_query($db_connection, $sql);
+            if ($result->num_rows > 0) {
+                while($row1 = mysqli_fetch_array($result)){
+                    // echo $row2;                   
+                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
+                     $fotos[] = $row1;  
+                    }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene fotos';
+            }
+            //array_push($row,array('fotos' => $fotos) );
+            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
+            $pedidos = [];
+            $fotos=[];
+            
+        }
+        echo json_encode($respuesta);
+   
     }
 
     public function Listar_Pedidos_Aceptados($f3)
