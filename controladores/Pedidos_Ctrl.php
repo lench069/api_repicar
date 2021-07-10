@@ -645,12 +645,13 @@ class Pedidos_Ctrl
         }
 
         $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
-        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
+        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, pe.ESTADO,pe.FECHA_FIN,
         ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
          "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Aceptado' and propues.ACEPT=1 order by pe.FECHA_INI DESC";
+        
         $resultado = mysqli_query($db_connection, $sql);
         $pedidos = array();
         while($row = mysqli_fetch_array($resultado)){
@@ -659,6 +660,52 @@ class Pedidos_Ctrl
             
         }
         echo json_encode($pedidos);
+      
+       
+    }
+    public function Listar_Pedidos_Finalizados($f3)
+    {
+        $db_host="localhost";
+        $db_user="root";
+        $db_password="";
+        $db_name="repicar";
+
+        $fecha_inicial= new DateTime();
+        $fecha_inicial->modify('first day of this month');
+        $fecha_final= new DateTime();
+        $fecha_final->modify('last day of this month');
+        $respuesta = array();
+
+                
+        // Create connection
+        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
+    
+        mysqli_set_charset($db_connection, 'utf8');
+        
+        // Check connection
+        if ($db_connection->connect_error) {
+        die("Connection failed: " . $db_connection->connect_error);
+        }
+
+
+        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, pe.ESTADO,pe.FECHA_FIN,
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, propues.P_ORIGINAL, propues.P_ORIGINAL_COM FROM `proveedor` as pro INNER JOIN
+         propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
+         propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
+         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
+         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Aceptado' and propues.ACEPT=1 and 
+         pe.FECHA_FIN BETWEEN "."'".$fecha_inicial->format('Y-m-d')."'"." AND "."'".$fecha_final->format('Y-m-d')."'"." 
+         order by pe.FECHA_INI DESC";
+        $resultado = mysqli_query($db_connection, $sql);
+        $pedidos = array();
+        while($row = mysqli_fetch_array($resultado)){
+                
+            $pedidos[] = $row; 
+            
+        }
+        array_push($respuesta,array('finalizados' => $pedidos,'fecha_ini' => $fecha_inicial->format('Y-m-d'),'fecha_fin' => $fecha_final->format('Y-m-d')) );
+        echo json_encode($respuesta);
       
        
     }
