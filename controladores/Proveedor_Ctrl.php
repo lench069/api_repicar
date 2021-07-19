@@ -164,7 +164,7 @@ class Proveedor_Ctrl
         }
 
         $sql = "SELECT pro.NOMBRES, pro.CI_RUC,pro.TELEFONO,pro.EMAIL,pro.NOMBRE_LOCAL,pro.DIRECCION,
-        pro.SECTOR,c.NOMBRE as NOMBRE_C,provin.NOMBRE as NOMBRE_PRO FROM `proveedor` as pro INNER JOIN 
+        pro.SECTOR,c.NOMBRE as NOMBRE_C,provin.NOMBRE as NOMBRE_PRO, pro.ESTADO FROM `proveedor` as pro INNER JOIN 
         ciudad as c on pro.ID_CIUDAD_F=c.ID_CIUDAD INNER JOIN provincia as provin on 
         c.ID_PROVINCIA=provin.ID_PROVINCIA where `CI_RUC` ="."'".$f3->get('PARAMS.cod_proveedor')."'";
        
@@ -219,6 +219,52 @@ class Proveedor_Ctrl
         echo json_encode($proveedores);
       
        
+    }
+
+    public function actualizar($f3)
+    {
+        $id_proveedor = $f3->get('PARAMS.id_proveedor');
+        $this->M_Proveedor->load(['CI_RUC = ?',$id_proveedor]);
+        $msg='';
+        $info = array();
+        if($this->M_Proveedor->loaded() > 0)
+        {
+            $_proveedor = new M_Proveedor();
+            $_proveedor->load(['EMAIL = ? AND CI_RUC <> ?',$f3->get('POST.email'),$id_proveedor]);
+            if($_proveedor->loaded() > 0)
+            {
+                $msg = 'Proveedor no se pudo actualizar debido a que el correo se enceuntra en uso de otro proveedor';
+                $info['CI_RUC'] = 0;
+            }else{
+          
+
+            $this->M_Proveedor->set('NOMBRES', $f3->get('POST.nombres'));
+            $this->M_Proveedor->set('ESTADO', $f3->get('POST.estado'));
+            $this->M_Proveedor->set('TELEFONO', $f3->get('POST.telefono'));
+            $this->M_Proveedor->set('EMAIL', $f3->get('POST.email'));
+            $this->M_Proveedor->set('NOMBRE_LOCAL', $f3->get('POST.nombre_local'));
+            $this->M_Proveedor->set('DIRECCION', $f3->get('POST.direccion'));
+            $this->M_Proveedor->set('SECTOR', $f3->get('POST.sector'));
+            $this->M_Proveedor->set('CONTRASENIA', '123');
+
+
+
+                $this->M_Proveedor->save();
+                $msg = 'Proveedor fue actualizado';
+                $info['CI_RUC'] = $this->M_Proveedor->get('CI_RUC');
+            }
+
+        }else
+        {
+            $msg = 'El cliente no existe';
+            $info['CI_RUC'] = 0;
+
+        }
+        echo json_encode([
+            'mensaje' => $msg,           
+            'info' => $info
+        ]);
+        
     }
 
 
