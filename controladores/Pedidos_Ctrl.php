@@ -753,5 +753,28 @@ class Pedidos_Ctrl
         
     }
 
+    public function total_ventas($f3)
+    {
+       
+        $fecha_inicial= new DateTime();
+        $fecha_inicial->modify('first day of this month');
+        $fecha_final= new DateTime();
+        $fecha_final->modify('last day of this month');
+        $respuesta = array();   
+
+        $respuesta  = $f3->get('DB')->exec("SELECT count(pro.CI_RUC) as VENTAS,sum(propues.P_ORIGINAL) as 
+        TOTAL_ORIGINAL,sum(propues.P_ORIGINAL_COM) as TOTAL_ORIGINAL_COM FROM `proveedor` as pro INNER JOIN 
+        propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
+        propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
+        INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
+         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Aceptado' and propues.ACEPT=1 and 
+         pe.FECHA_FIN BETWEEN "."'".$fecha_inicial->format('Y-m-d')."'"." AND "."'".$fecha_final->format('Y-m-d')."'"." 
+         order by pe.FECHA_INI DESC");
+
+        echo json_encode($respuesta);
+      
+       
+    }
+
 
 }
