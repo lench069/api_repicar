@@ -207,7 +207,12 @@ class Proveedor_Ctrl
         }
 
 
-        $sql = "SELECT provee.NOMBRES,provee.CI_RUC,provee.TELEFONO,provee.EMAIL,provee.NOMBRE_LOCAL,ciu.NOMBRE as NOM_CIUDAD,provee.DIRECCION,provee.SECTOR,est_provee.DESCRIPCION as ESTADO,est_provee.ID_ESTADO FROM `proveedor` as provee INNER JOIN estado_proveedor as est_provee on provee.ESTADO = est_provee.ID_ESTADO INNER JOIN ciudad as ciu on provee.ID_CIUDAD_F=ciu.ID_CIUDAD order by est_provee.DESCRIPCION desc";
+        $sql = "SELECT provee.NOMBRES,provee.CI_RUC,provee.TELEFONO,provee.EMAIL,provee.NOMBRE_LOCAL,
+        ciu.NOMBRE as NOM_CIUDAD,provee.DIRECCION,provee.SECTOR,est_provee.DESCRIPCION as ESTADO,
+        est_provee.ID_ESTADO, provee.`RESETCONTRA`,provee.`TIPO_PUBLICIDAD`,provee.`LICENCIA` 
+        FROM `proveedor` as provee INNER JOIN estado_proveedor as est_provee on 
+        provee.ESTADO = est_provee.ID_ESTADO INNER JOIN ciudad as ciu on provee.ID_CIUDAD_F=ciu.ID_CIUDAD 
+        order by est_provee.DESCRIPCION desc";
         $resultado = mysqli_query($db_connection, $sql);
         while($row = mysqli_fetch_array($resultado)){
                 
