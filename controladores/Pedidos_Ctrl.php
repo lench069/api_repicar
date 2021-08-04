@@ -646,7 +646,7 @@ class Pedidos_Ctrl
 
         $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
         pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, pe.ESTADO,pe.FECHA_FIN,
-        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, propues.P_ORIGINAL, propues.P_ORIGINAL_COM FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
@@ -654,12 +654,31 @@ class Pedidos_Ctrl
         
         $resultado = mysqli_query($db_connection, $sql);
         $pedidos = array();
+        $fotos = array();
+        $respuesta = array();
         while($row = mysqli_fetch_array($resultado)){
-                
+          
             $pedidos[] = $row; 
+
+            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
+            
+            $result = mysqli_query($db_connection, $sql);
+            if ($result->num_rows > 0) {
+                while($row1 = mysqli_fetch_array($result)){
+                    // echo $row2;                   
+                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
+                     $fotos[] = $row1;  
+                    }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene fotos';
+            }
+            //array_push($row,array('fotos' => $fotos) );
+            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
+            $pedidos = [];
+            $fotos=[];
             
         }
-        echo json_encode($pedidos);
+        echo json_encode($respuesta);
       
        
     }

@@ -44,7 +44,7 @@ class Administradores_Ctrl
         
     }
 
-    public function consultar($f3)
+    /*public function consultar($f3)
     {
         $db_host="localhost";
         $db_user="root";
@@ -85,6 +85,30 @@ class Administradores_Ctrl
 
         ]);
         
+    }*/
+
+    public function consultar($f3)
+    {
+        $proveedores = array();   
+        $proveedores  = $f3->get('DB')->exec("SELECT * from administradores where `ID_ADMINISTRADOR` ="."'".$f3->get('PARAMS.cod_Administradores')."'");
+        echo $f3->get('DB')->log();
+        foreach ($proveedores  as $proveedor) {
+            $items[] = $proveedor;
+        }
+        /*echo $items;
+        /*if($items[] == [])
+        {
+            $msg = 'Administradores no exites'; 
+        }else{
+            $msg = 'Administradores encontrado';
+        }
+        echo json_encode([
+            'mensaje' => $msg,
+           
+                'Administradores' => $items,
+
+        ]);*/
+           
     }
 
 
