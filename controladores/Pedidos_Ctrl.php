@@ -571,7 +571,7 @@ class Pedidos_Ctrl
        
     }
 
-    public function Listar_Pedidos_Enviados($f3)
+    /*public function Listar_Pedidos_Enviados($f3)
     {
         $db_host="localhost";
         $db_user="root";
@@ -625,9 +625,45 @@ class Pedidos_Ctrl
         }
         echo json_encode($respuesta);
    
+    }*/
+
+    public function Listar_Pedidos_Enviados($f3)
+    {
+        $resultado = array();   
+        $resultado  = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA,propues.P_ORIGINAL,propues.P_ORIGINAL_COM,
+        propues.P_GENERICO,propues.P_GENERICO_COM,propues.P_ENVIO,propues.FACTURA as FAC_PROPUESTA,propues.ENVIO 
+        as ENV_PROPUESTA,pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
+         propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
+         propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
+         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
+         "."'".$f3->get('POST.id_proveedor')."'"." and (propues.ESTADO = 'Cotizado' or propues.ESTADO='Aceptado') and propues.ACEPT=0 order by pe.FECHA_INI DESC");
+       //echo $f3->get('DB')->log();
+        $pedidos = array();
+        $fotos = array();
+        $respuesta = array();
+        foreach ($resultado  as $row) {
+            $pedidos[] = $row; 
+            $result =  $f3->get('DB')->exec("SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'");
+            if (count($resultado) > 0) {        
+                    foreach ($result  as $row1){
+                    // echo $row2;                   
+                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
+                     $fotos[] = $row1;  
+                    }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene fotos';
+            }
+            //array_push($row,array('fotos' => $fotos) );
+            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
+            $pedidos = [];
+            $fotos=[];
+        }
+        echo json_encode($respuesta);
     }
 
-    public function Listar_Pedidos_Aceptados($f3)
+   /* public function Listar_Pedidos_Aceptados($f3)
     {
         $db_host="localhost";
         $db_user="root";
@@ -681,7 +717,43 @@ class Pedidos_Ctrl
         echo json_encode($respuesta);
       
        
+    }*/
+
+    public function Listar_Pedidos_Aceptados($f3)
+    {
+        $resultado = array();   
+        $resultado  = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, pe.ESTADO,pe.FECHA_FIN,
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, propues.P_ORIGINAL, propues.P_ORIGINAL_COM FROM `proveedor` as pro INNER JOIN
+         propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
+         propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
+         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
+         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Aceptado' and propues.ACEPT=1 order by pe.FECHA_INI DESC");
+       //echo $f3->get('DB')->log();
+        $pedidos = array();
+        $fotos = array();
+        $respuesta = array();
+        foreach ($resultado  as $row) {
+            $pedidos[] = $row; 
+            $result =  $f3->get('DB')->exec("SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'");
+            if (count($resultado) > 0) {        
+                    foreach ($result  as $row1){
+                    // echo $row2;                   
+                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
+                     $fotos[] = $row1;  
+                    }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene fotos';
+            }
+            //array_push($row,array('fotos' => $fotos) );
+            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
+            $pedidos = [];
+            $fotos=[];
+        }
+        echo json_encode($respuesta);
+
     }
+
     public function Listar_Pedidos_Finalizados($f3)
     {
         $db_host="localhost";
