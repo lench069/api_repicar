@@ -68,7 +68,7 @@ class Pedidos_Ctrl
                 $this->M_Datos_Envio->save(); 
             }
  //Creacion de Propuestas
-            $result = $this->M_Proveedor->find(['ID_CIUDAD_F = ?', $f3->get('POST.id_ciudad')]);
+            $result = $this->M_Proveedor->find(['ID_CIUDAD_F = ? AND ESTADO = ?', $f3->get('POST.id_ciudad'), 2]);
             $items = array();
             $carros = ['auto','perro'];
             foreach($result as $proveedor) {
