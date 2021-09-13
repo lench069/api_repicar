@@ -6,6 +6,9 @@ class Proveedor_Ctrl
 {
     public $M_Proveedor = null;
    // public $server = 'http://192.168.100.19/api_repicar/';
+    public $key="01234567890123456789012345678901"; // 32 bytes
+    public $vector="1234567890123412"; // 16 bytes
+
     public function __construct()
     {
         $this->M_Proveedor = new M_Proveedor();
@@ -140,10 +143,10 @@ public function cambiar_contrasenia($f3)
 }
 
 public function olvide_contrasenia($f3)
-{
+{  
     $this->M_Proveedor->load(['CI_RUC = ? and EMAIL = ?',$f3->get('POST.ci_ruc'), $f3->get('POST.correo')]);
     $id_proveedor = $f3->get('POST.ci_ruc');
-    $pass = $f3->get('POST.pass_temp');
+    $pass = $this->myDecrypt($f3->get('POST.pass_temp'), $this->key, $this->vector); // desencripta
     $msg='';
     $flag='';
     $item = array();
@@ -154,7 +157,7 @@ public function olvide_contrasenia($f3)
         $this->M_Proveedor->save();
         if($this->M_Proveedor->save())
         {
-            $this->enviar_correo_datos($f3->get('POST.correo'),'Datos de ingreso Repicar',$id_proveedor,$pass);
+            $this->enviar_correo_datos($f3->get('POST.correo'),'Olvide mi contraseña',$id_proveedor,$pass,$this->M_Proveedor->get('NOMBRE_LOCAL'));
         }
         $item = $this->M_Proveedor->cast();
         $flag = 'true';
@@ -320,14 +323,14 @@ public function verificar_cambio_contrasenia($f3)
     public function actualizar($f3)
     {
         $id_proveedor = $f3->get('PARAMS.id_proveedor');
-        $this->M_Proveedor->load(['CI_RUC = ?',$id_proveedor]);
+        $this->M_Proveedor->load(['CI_RUC = ?',$id_proveedor]);       
         $msg='';
         $info = array();
         if($this->M_Proveedor->loaded() > 0)
         {          
           if($f3->get('POST.estado') == 2)
           {
-
+            $this->M_Proveedor->set('CONTRASENIA', $f3->get('POST.contrasenia'));
           }
             $this->M_Proveedor->set('NOMBRES', $f3->get('POST.nombres'));
             $this->M_Proveedor->set('ESTADO', $f3->get('POST.estado'));
@@ -336,15 +339,15 @@ public function verificar_cambio_contrasenia($f3)
             $this->M_Proveedor->set('NOMBRE_LOCAL', $f3->get('POST.nombre_local'));
             $this->M_Proveedor->set('DIRECCION', $f3->get('POST.direccion'));
             $this->M_Proveedor->set('SECTOR', $f3->get('POST.sector'));
-            $this->M_Proveedor->set('CONTRASENIA', $f3->get('POST.contrasenia'));
-
-            $pass = $f3->get('POST.contrasenia');
+            $this->M_Proveedor->set('RESETCONTRA', 1);
+            
+            $pass = $this->myDecrypt($f3->get('POST.contrasenia'), $this->key, $this->vector); // desencripta
 
              $this->M_Proveedor->save();
             if($this->M_Proveedor->save())
             {
                        
-                $this->enviar_correo_datos($f3->get('POST.email'),'Datos de ingreso Repicar',$id_proveedor,$pass);     
+                $this->enviar_correo_datos($f3->get('POST.email'),'Datos de ingreso Repicar',$id_proveedor,$pass,$f3->get('POST.nombre_local'));     
 
               }
 
@@ -366,11 +369,11 @@ public function verificar_cambio_contrasenia($f3)
     }
 
 
-    public function enviar_correo_datos($correo,$asunto,$id_proveedor,$pass)
+    public function enviar_correo_datos($correo,$asuntop,$id_proveedor,$pass,$nombre_local)
     {
         $nombre = 'Repicar';
         $mail = 'lcvelastegui@gmail.com';
-        $asunto = 'Datos RepiCar';
+        $asunto = $asuntop;
 
         $email_user = "lcvelastegui@gmail.com";
         $email_password = "@P@ssw0rd69";
@@ -412,7 +415,7 @@ public function verificar_cambio_contrasenia($f3)
             <tr>
                 <td style='background-color: #093856'>
                     <div style='color: #FDFEFE; margin: 4% 10% 2%; text-align: justify;font-family: sans-serif'>
-                        <h2 style='color: #FDC134; margin: 0 0 7px'>FELICIDADES, Ya eres un socio REPICAR.!</h2>
+                        <h2 style='color: #FDC134; margin: 0 0 7px'>FELICIDADES $nombre_local, Ya eres un socio REPICAR.!</h2>
                         <p style='margin: 2px; font-size: 15px; style='color: #FFFF'>
                         Gracias por suscribirte a REPICAR, Tus datos para el ingreso a la plataforma son:   </p>
                         <ul style='font-size: 15px;  margin: 10px 0 ; style='color: #FFFF'>
@@ -439,7 +442,36 @@ Visítanos en la página oficial (Repicar.com) o en nuestra página de Facebook
 
     }
 
-
-   
+    function myCrypt($value, $key, $iv){
+        $encrypted_data = openssl_encrypt($value, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+        return base64_encode($encrypted_data);
+    }
+    
+    function myDecrypt($value, $key, $iv){
+        $value = base64_decode($value);
+        $data = openssl_decrypt($value, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+        return $data;
+    }
+ 
 }
+
+/* FUNCION PARA ENCRIPTAR Y DESENCRIPTAR
+   function myCrypt($value, $key, $iv){
+    $encrypted_data = openssl_encrypt($value, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+    return base64_encode($encrypted_data);
+        }
+
+        function myDecrypt($value, $key, $iv){
+            $value = base64_decode($value);
+            $data = openssl_decrypt($value, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+            return $data;
+        }
+
+        $valTxt="MyText";
+        $key="01234567890123456789012345678901"; // 32 bytes
+        $vector="1234567890123412"; // 16 bytes
+        $encrypted = myCrypt($valTxt, $key, $vector);
+        $decrypted = myDecrypt($encrypted, $key, $vector);
+        print($encrypted . "\n");
+        print($decrypted . "\n");*/
 
