@@ -36,12 +36,12 @@ class Proveedor_Ctrl
              {
                        
                         $nombre = 'Repicar';
-                        $mail = 'lcvelastegui@gmail.com';
+                        $mail = 'inforepicar@gmail.com';
                         $asunto = 'Bienvenida';
                         $mensaje = 'esto es una prueba';
                 
-                        $email_user = "lcvelastegui@gmail.com";
-                        $email_password = "@P@ssw0rd69";
+                        $email_user = "inforepicar@gmail.com";
+                        $email_password = "apprepicarinfo";
                         $the_subject = $asunto;
                         $address_to = $f3->get('POST.email'); //AQUI CAMBIAR EL CORREO AL QUE QUIEES QUE TE LLEGUEN LOS CORREOS
                         $from_name = $nombre;
@@ -372,11 +372,11 @@ public function verificar_cambio_contrasenia($f3)
     public function enviar_correo_datos($correo,$asuntop,$id_proveedor,$pass,$nombre_local)
     {
         $nombre = 'Repicar';
-        $mail = 'lcvelastegui@gmail.com';
+        $mail = 'inforepicar@gmail.com';
         $asunto = $asuntop;
 
-        $email_user = "lcvelastegui@gmail.com";
-        $email_password = "@P@ssw0rd69";
+        $email_user = "inforepicar@gmail.com";
+        $email_password = "apprepicarinfo";
         $the_subject = $asunto;
         $address_to = $correo; //AQUI CAMBIAR EL CORREO AL QUE QUIEES QUE TE LLEGUEN LOS CORREOS
         $from_name = $nombre;
@@ -451,6 +451,95 @@ Visítanos en la página oficial (Repicar.com) o en nuestra página de Facebook
         $value = base64_decode($value);
         $data = openssl_decrypt($value, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
         return $data;
+    }
+
+    function contactanos_enviar ($f3)
+    {
+        //Datos de la persona que se quiere contactar
+        $nombreP = $f3->get('POST.nombre');
+        $correoP = $f3->get('POST.correo');
+        $mensajeP = $f3->get('POST.mensaje');
+        $asuntoP = $f3->get('POST.asunto');
+
+        $nombre = 'Repicar';
+        $mail = 'inforepicar@gmail.com';
+        $asunto = 'Pregunta de cliente';
+
+        $email_user = "inforepicar@gmail.com";
+        $email_password = "apprepicarinfo";
+        $the_subject = $asunto;
+        $address_to = $mail; //AQUI CAMBIAR EL CORREO AL QUE QUIEES QUE TE LLEGUEN LOS CORREOS
+        $from_name = $nombre;
+        $phpmailer = new PHPMailer();
+        // ---------- datos de la cuenta de Gmail -------------------------------
+        $phpmailer->Username = $email_user;
+        $phpmailer->Password = $email_password; 
+        //-----------------------------------------------------------------------
+        // $phpmailer->SMTPDebug = 1;
+        $phpmailer->SMTPSecure = 'ssl';
+        $phpmailer->Host = "smtp.gmail.com"; // GMail
+        $phpmailer->Port = 465;
+        $phpmailer->IsSMTP(); // use SMTP
+        $phpmailer->SMTPAuth = true;
+        $phpmailer->setFrom($phpmailer->Username,$from_name);
+        $phpmailer->AddAddress($address_to); // recipients email
+        $phpmailer->Subject = $the_subject;	 
+        $phpmailer->Body .="<body style='background-color: black'>
+
+        <!--Copia desde aquí-->
+        <table style='max-width: 600px; padding: 10px; margin:0 auto; border-collapse: collapse;'>
+            <tr>
+                <td style='background-color: #093856; text-align: left; padding: 0'>
+                    
+                        <center><img width='15%' style='display:block; margin: 1.5% 3%' src='https://docs.google.com/uc?export=download&id=1iNXe-TAFQKqvkjbsHB1wmpHSHPJD2VaO'></center>
+                    
+                </td>
+            </tr>
+
+            <tr>
+                <td style='padding: 0'
+                    <img style='padding: 0; display: block' src='https://s19.postimg.org/y5abc5ryr/alola_region.jpg' width='100%'>
+                </td>
+            </tr>
+            
+            <tr>
+                <td style='background-color: #093856'>
+                    <div style='color: #FDFEFE; margin: 4% 10% 2%; text-align: justify;font-family: sans-serif'>
+                        <h2 style='color: #FDC134; margin: 0 0 7px'>Nuevo Mensaje de $nombreP !</h2>
+                        <p style='margin: 2px; font-size: 15px; style='color: #FDC134'>
+                        El asunto del cliente es: <span>$asuntoP</span>  </p>                     
+                        <p style='margin: 2px; font-size: 15px; style='color: #FDC134'>
+                        Su correo es:  <span>$correoP</span> </p>                     
+                        <p style='margin: 2px; font-size: 15px; style='color: #FDC134'>
+                        Su mensaje es:   </p>
+                        <p style='margin: 2px; font-size: 15px; style='color: #FFFF' >
+                        <span>$mensajeP</span>
+                        </p>
+                        
+                        <p style='color: #b3b3b3; font-size: 12px; text-align: center;margin: 30px 0 0'>Derechos reservados Repicar Diseñado por RiobytesSolutions</p>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <!--hasta aquí-->
+
+        </body>";
+
+
+        $phpmailer->IsHTML(true);
+        if($phpmailer->Send())
+        {
+            echo json_encode([
+                'mensaje' => 'Mensaje enviado',           
+                'envio' => 'true'
+            ]);
+        }else{
+            echo json_encode([
+                'mensaje' => 'Mensaje no enviado, vuelva a intentarlo',           
+                'envio' => 'false'
+            ]);
+        }
+
     }
  
 }
