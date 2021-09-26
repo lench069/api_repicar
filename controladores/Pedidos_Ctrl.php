@@ -8,7 +8,7 @@ class Pedidos_Ctrl
     public $M_Propuesta = null;
     public $M_Proveedor = null;
     public $M_Fotos = null;
-    public $server = 'http://192.168.100.19/api_repicar/';
+    public $server = 'http://192.168.100.19:8080/api_repicar/';
     public $time;
     
 
@@ -219,8 +219,7 @@ class Pedidos_Ctrl
            $sql = "SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
            p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV 
            FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
-           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and `ESTADO`='Creado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente');
-           
+           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and `ESTADO`='Creado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente')." ORDER BY FECHA_INI DESC";
 
             $resultado1 = mysqli_query($db_connection, $sql);
             $row2= array();
