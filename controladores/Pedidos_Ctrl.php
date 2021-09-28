@@ -234,6 +234,20 @@ class Pedidos_Ctrl
         echo json_encode($total);
     }
 
+    public function Total_Pedidos($f3)
+    {
+        $resultado  = $f3->get('DB')->exec("SELECT COUNT(*) as total_pedido
+        FROM `pedidos` where `ID_CLIENTE` =10 and ESTADO='Creado' ORDER by `FECHA_INI` desc");
+         
+        $resultado1  = $f3->get('DB')->exec("SELECT COUNT(*) as total_pedido_Aceptados
+         FROM `pedidos` where `ID_CLIENTE` =10 and ESTADO='Finalizado' ORDER by `FECHA_INI` desc");
+        $totales = array();
+        array_push($totales,array('info_totales' => $resultado,'totales_pedidos' => $resultado1) );
+        echo json_encode([         
+            'info' => $totales
+        ]);
+    }
+
     public function Listar_Pedidos_Historial($f3)
     {
         $db_host="localhost";
