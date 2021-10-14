@@ -66,9 +66,19 @@ class Propuesta_Ctrl
         {
                $this->M_Propuesta->set('ESTADO', $f3->get('POST.estado'));
                 $this->M_Propuesta->set('FECHA_FIN', $this->fecha_fin);  
-                $this->M_Propuesta->save();
-                $msg = 'Propuesta fue aceptada';
-                $info['id'] = $this->M_Propuesta->get('ID_PROPUESTA');
+                if($this->M_Propuesta->save())
+                {
+                    $resultado  = $f3->get('DB')->exec("UPDATE `propuesta` SET `ESTADO`='Eliminado',
+                    `FECHA_FIN`="."'".$this->fecha_fin."'"." WHERE `COD_PEDIDO` ="."'".$f3->get('POST.cod_pedido')."'"." AND
+                    ID_PROPUESTA <>".$this->M_Propuesta->get('ID_PROPUESTA'));
+                   // echo $f3->get('DB')->log();
+                    $msg = 'Propuesta fue aceptada';
+                    $info['id'] = $this->M_Propuesta->get('ID_PROPUESTA');
+                }else{
+                    $msg = 'Ocurrio un Error';
+                    $info['id'] = 0;
+                }
+               
         }else
         {
             $msg = 'La propuesta no existe';
