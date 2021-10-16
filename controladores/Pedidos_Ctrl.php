@@ -332,7 +332,7 @@ class Pedidos_Ctrl
             c.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVIN FROM `propuesta` as pro INNER JOIN 
             proveedor as prove on pro.`CI_RUC` = prove.CI_RUC INNER JOIN ciudad as c on 
             prove.ID_CIUDAD_F=c.ID_CIUDAD INNER JOIN provincia as provin ON c.ID_PROVINCIA=provin.ID_PROVINCIA
-             WHERE `COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'"."and (pro.ESTADO='Cotizado' or pro.ESTADO='Aceptado')";
+             WHERE `COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'"."and (pro.ESTADO='Cotizado' or pro.ESTADO='Aceptado') order by pro.FECHA_INI desc" ;
            
             $result = mysqli_query($db_connection, $sql);
             if ($result->num_rows > 0) {
@@ -646,8 +646,8 @@ class Pedidos_Ctrl
         $resultado  = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA,propues.P_ORIGINAL,propues.P_ORIGINAL_COM,
         propues.P_GENERICO,propues.P_GENERICO_COM,propues.P_ENVIO,propues.FACTURA as FAC_PROPUESTA,propues.ENVIO 
         as ENV_PROPUESTA,pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
-        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
-        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
+        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO as ESTADO_PEDIDO,pe.FECHA_INI, 
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, propues.ESTADO as ESTADO_PROPUESTA FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
