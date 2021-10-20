@@ -242,36 +242,21 @@ public function verificar_cambio_contrasenia($f3)
 
     public function consultar($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
 
-        $sql = "SELECT pro.NOMBRES, pro.CI_RUC,pro.TELEFONO,pro.EMAIL,pro.NOMBRE_LOCAL,pro.DIRECCION,
+        $f3->get('DB')->begin();
+        $sql = $f3->get('DB')->exec("SELECT pro.NOMBRES, pro.CI_RUC,pro.TELEFONO,pro.EMAIL,pro.NOMBRE_LOCAL,pro.DIRECCION,
         pro.SECTOR,c.NOMBRE as NOMBRE_C,provin.NOMBRE as NOMBRE_PRO, pro.ESTADO, pro.RESETCONTRA,pro.TIPO_PUBLICIDAD,pro.LICENCIA FROM `proveedor` as pro INNER JOIN 
         ciudad as c on pro.ID_CIUDAD_F=c.ID_CIUDAD INNER JOIN provincia as provin on 
-        c.ID_PROVINCIA=provin.ID_PROVINCIA where `CI_RUC` ="."'".$f3->get('PARAMS.cod_proveedor')."'";
-       
-        $resultado = mysqli_query($db_connection, $sql);
-
+        c.ID_PROVINCIA=provin.ID_PROVINCIA where `CI_RUC` ="."'".$f3->get('PARAMS.cod_proveedor')."'");
+        $f3->get('DB')->commit();
         $proveedor = array();
-        if ($resultado->num_rows > 0) {
+        if ($sql) {
             $msg = 'Proveedor encontrado';
              // output data of each row
-            $proveedor = mysqli_fetch_assoc($resultado);
+            $proveedor = $sql[0];
 
         }else{
-            $msg = 'Proveedor no exites';
+            $msg = 'Proveedor no exite';
         }
 
         echo json_encode([
@@ -285,39 +270,24 @@ public function verificar_cambio_contrasenia($f3)
 
     public function listar_proveedores($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
+        $f3->get('DB')->begin();
 
-        $respuesta = array();
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
-
-
-        $sql = "SELECT provee.NOMBRES,provee.CI_RUC,provee.TELEFONO,provee.EMAIL,provee.NOMBRE_LOCAL,
+        $resultado = $f3->get('DB')->exec("SELECT provee.NOMBRES,provee.CI_RUC,provee.TELEFONO,provee.EMAIL,provee.NOMBRE_LOCAL,
         ciu.NOMBRE as NOM_CIUDAD,provee.DIRECCION,provee.SECTOR,est_provee.DESCRIPCION as ESTADO,
         est_provee.ID_ESTADO, provee.`RESETCONTRA`,provee.`TIPO_PUBLICIDAD`,provee.`LICENCIA` 
         FROM `proveedor` as provee INNER JOIN estado_proveedor as est_provee on 
         provee.ESTADO = est_provee.ID_ESTADO INNER JOIN ciudad as ciu on provee.ID_CIUDAD_F=ciu.ID_CIUDAD 
-        order by est_provee.DESCRIPCION desc";
-        $resultado = mysqli_query($db_connection, $sql);
-        while($row = mysqli_fetch_array($resultado)){
-                
+        order by est_provee.DESCRIPCION desc");
+
+        $f3->get('DB')->commit();
+
+        foreach ($resultado  as $row)
+        {
             $proveedores[] = $row; 
-            
         }
+
         echo json_encode($proveedores);
-      
-       
+        
     }
 
     public function actualizar($f3)

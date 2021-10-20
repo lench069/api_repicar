@@ -189,41 +189,29 @@ class Pedidos_Ctrl
     }
     public function Listar_Pedidos($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
-
-        $sql = "SELECT SUBSTRING(`FECHA_INI`,1,10) as FECHA_INICIAL,COUNT(`FECHA_INI`) as num
-        FROM `pedidos` where `ID_CLIENTE` =". $f3->get('POST.id_cliente')." and ESTADO='Creado' GROUP by FECHA_INICIAL ORDER by `FECHA_INI` desc";
-        $resultado = mysqli_query($db_connection, $sql);
+       
+        $f3->get('DB')->begin();
+        $resultado = $f3->get('DB')->exec("SELECT SUBSTRING(`FECHA_INI`,1,10) as FECHA_INICIAL,COUNT(`FECHA_INI`) as num
+        FROM `pedidos` where `ID_CLIENTE` =". $f3->get('POST.id_cliente')." and ESTADO='Creado' GROUP by FECHA_INICIAL ORDER by `FECHA_INI` desc");
+        $f3->get('DB')->commit();
         $fecha = '';
         $pedidos = array();
         $total = array();
         
-        while($row1 = mysqli_fetch_array($resultado)){
+        foreach ($resultado  as $row1){
             //echo $row1['FECHA_INICIAL'];
-            $pedidos= [];
+           $pedidos= [];
            $fecha = $row1['FECHA_INICIAL'];
            $cantidad = $row1['num'];
-           $sql = "SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
+           $f3->get('DB')->begin();
+           $resultado1= $f3->get('DB')->exec("SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
            p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV 
            FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
-           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and `ESTADO`='Creado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente')." ORDER BY FECHA_INI DESC";
-
-            $resultado1 = mysqli_query($db_connection, $sql);
+           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and `ESTADO`='Creado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente')." ORDER BY FECHA_INI DESC");
+            $f3->get('DB')->commit();
             $row2= array();
-            while($row2 = mysqli_fetch_array($resultado1)){
+            foreach ($resultado1  as $row2)
+            {
                // echo $row2;
                 $pedidos[] = $row2;
                 
@@ -250,41 +238,29 @@ class Pedidos_Ctrl
 
     public function Listar_Pedidos_Historial($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
-
-        $sql = "SELECT SUBSTRING(`FECHA_INI`,1,10) as FECHA_INICIAL,COUNT(`FECHA_INI`) as num
-        FROM `pedidos` where ESTADO='Finalizado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente')." GROUP by FECHA_INICIAL ORDER by `FECHA_INI` desc";
-        $resultado = mysqli_query($db_connection, $sql);
+        $f3->get('DB')->begin();
+        $resultado = $f3->get('DB')->exec("SELECT SUBSTRING(`FECHA_INI`,1,10) as FECHA_INICIAL,COUNT(`FECHA_INI`) as num
+        FROM `pedidos` where ESTADO='Finalizado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente')." GROUP by FECHA_INICIAL ORDER by `FECHA_INI` desc");
+        $f3->get('DB')->commit();
         $fecha = '';
         $pedidos = array();
         $total = array();
-        while($row1 = mysqli_fetch_array($resultado)){
+        foreach ($resultado  as $row1)
+        {
             //echo $row1['FECHA_INICIAL'];
-            $pedidos= [];
+           $pedidos= [];
            $fecha = $row1['FECHA_INICIAL'];
            $cantidad = $row1['num'];
-           $sql = "SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
+           $f3->get('DB')->begin();
+           $resultado1 = $f3->get('DB')->exec("SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
            p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV 
            FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
-           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and ESTADO='Finalizado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente');
+           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and ESTADO='Finalizado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente'));
            //echo $sql;
-
-            $resultado1 = mysqli_query($db_connection, $sql);
+           $f3->get('DB')->commit();
             $row2= array();
-            while($row2 = mysqli_fetch_array($resultado1)){
+            foreach ($resultado1  as $row2)
+            {
                // echo $row2;
                 $pedidos[] = $row2;
                 
@@ -298,45 +274,33 @@ class Pedidos_Ctrl
 
     public function consultar($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
+        $f3->get('DB')->begin();
 
-        $sql = "SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
+        $resultado = $f3->get('DB')->exec("SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
         p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV 
         FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
-        as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE  `COD_PEDIDO` ="."'".$f3->get('PARAMS.cod_pedido')."'";
-        $resultado = mysqli_query($db_connection, $sql);
+        as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE  `COD_PEDIDO` ="."'".$f3->get('PARAMS.cod_pedido')."'");
+        $f3->get('DB')->commit();
 
         $pedido = array();
         $propuesta = array();
-        if ($resultado->num_rows > 0) {
+        if ($resultado) {
             $msg = 'Pedido encontrado';
              // output data of each row
-            $pedido = mysqli_fetch_assoc($resultado);
-
-            $sql = "SELECT pro.CI_RUC,pro.COD_PEDIDO,pro.P_ORIGINAL,pro.P_GENERICO,pro.FACTURA,pro.ENVIO,
+            $pedido = $resultado[0];
+            $f3->get('DB')->begin();
+            $result = $f3->get('DB')->exec("SELECT pro.CI_RUC,pro.COD_PEDIDO,pro.P_ORIGINAL,pro.P_GENERICO,pro.FACTURA,pro.ENVIO,
             pro.ESTADO,pro.NOTIFICACION,pro.ID_PROPUESTA,pro.FECHA_INI,prove.NOMBRES as NOMBRE_PROVEE,
             prove.NOMBRE_LOCAL,prove.DIRECCION,prove.SECTOR, 
             c.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVIN FROM `propuesta` as pro INNER JOIN 
             proveedor as prove on pro.`CI_RUC` = prove.CI_RUC INNER JOIN ciudad as c on 
             prove.ID_CIUDAD_F=c.ID_CIUDAD INNER JOIN provincia as provin ON c.ID_PROVINCIA=provin.ID_PROVINCIA
-             WHERE `COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'"."and (pro.ESTADO='Cotizado' or pro.ESTADO='Aceptado') order by pro.FECHA_INI desc" ;
-           
-            $result = mysqli_query($db_connection, $sql);
-            if ($result->num_rows > 0) {
-                while($row = mysqli_fetch_array($result)){
+             WHERE `COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'"."and (pro.ESTADO='Cotizado' or pro.ESTADO='Aceptado') order by pro.FECHA_INI desc") ;
+            $f3->get('DB')->commit();
+
+            if ($result) {
+                foreach ($result  as $row)
+                {
                     // echo $row2;
                      $propuesta[] = $row;  
                  }
@@ -360,42 +324,29 @@ class Pedidos_Ctrl
 
     public function Listar_Pedidos_Nuevos($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
+        $f3->get('DB')->begin();
 
-        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        $resultado = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
         pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
         ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
-         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' order by pe.FECHA_INI DESC";
-        $resultado = mysqli_query($db_connection, $sql);
+         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' order by pe.FECHA_INI DESC");
+        $f3->get('DB')->commit();
         $pedidos = array();
         $fotos = array();
         $respuesta = array();
-        while($row = mysqli_fetch_array($resultado)){
+        foreach ($resultado  as $row){
           
             
             $pedidos[] = $row; 
+            $f3->get('DB')->begin();
+            $result = $f3->get('DB')->exec("SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'");
+            $f3->get('DB')->commit();
 
-            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
-            
-            $result = mysqli_query($db_connection, $sql);
-            if ($result->num_rows > 0) {
-                while($row1 = mysqli_fetch_array($result)){
+            if ($result) {
+                foreach ($result as $row1){
                     // echo $row2;                   
                      $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
                      $fotos[] = $row1;  
@@ -416,42 +367,26 @@ class Pedidos_Ctrl
 
     public function Listar_Pedidos_Nuevos_PorTipoV($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
+        $f3->get('DB')->begin();
 
-        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        $resultado = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
         pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
         ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
-         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' and pe.`TIPO_VEHICULO` = "."'".$f3->get('POST.detalle_tipov')."'"."  order by pe.FECHA_INI DESC";
-        $resultado = mysqli_query($db_connection, $sql);
+         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' and pe.`TIPO_VEHICULO` = "."'".$f3->get('POST.detalle_tipov')."'"."  order by pe.FECHA_INI DESC");
+        $f3->get('DB')->commit();
         $pedidos = array();
         $fotos = array();
         $respuesta = array();
-        while($row = mysqli_fetch_array($resultado)){
-          
-            
+        foreach ($resultado  as $row){ 
             $pedidos[] = $row; 
-
-            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
-            
-            $result = mysqli_query($db_connection, $sql);
-            if ($result->num_rows > 0) {
-                while($row1 = mysqli_fetch_array($result)){
+            $f3->get('DB')->begin();
+            $result = $f3->get('DB')->exec("SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'");
+            $f3->get('DB')->commit();
+            if ($result) {
+                foreach ($result  as $row1){
                     // echo $row2;                   
                      $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
                      $fotos[] = $row1;  
@@ -472,42 +407,28 @@ class Pedidos_Ctrl
 
     public function Listar_Pedidos_Nuevos_PorMarca($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
+        $f3->get('DB')->begin();
 
-        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        $resultado = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
         pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
         ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
-         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' and pe.`TIPO_VEHICULO` = "."'".$f3->get('POST.detalle_tipov')."'"." and pe.`MARCA` = "."'".$f3->get('POST.detalle_marca')."'"."  order by pe.FECHA_INI DESC";
-        $resultado = mysqli_query($db_connection, $sql);
+         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' and pe.`TIPO_VEHICULO` = "."'".$f3->get('POST.detalle_tipov')."'"." and pe.`MARCA` = "."'".$f3->get('POST.detalle_marca')."'"."  order by pe.FECHA_INI DESC");
+         $f3->get('DB')->commit();
         $pedidos = array();
         $fotos = array();
         $respuesta = array();
-        while($row = mysqli_fetch_array($resultado)){
+        foreach ($resultado  as $row){
           
             
             $pedidos[] = $row; 
-
-            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
-            
-            $result = mysqli_query($db_connection, $sql);
-            if ($result->num_rows > 0) {
-                while($row1 = mysqli_fetch_array($result)){
+            $f3->get('DB')->begin();
+            $result = $f3->get('DB')->exec("SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'");
+            $f3->get('DB')->commit();
+            if ($result) {
+                foreach ($result  as $row1){
                     // echo $row2;                   
                      $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
                      $fotos[] = $row1;  
@@ -528,44 +449,29 @@ class Pedidos_Ctrl
 
     public function Listar_Pedidos_Nuevos_PorTermino($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
+        $f3->get('DB')->begin();
 
-        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        $resultado = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
         pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
         ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
          "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' and (pe.`TIPO_VEHICULO` like "."'%".$f3->get('POST.termino')."%'"." 
-         || pe.`MARCA` like "."'%".$f3->get('POST.termino')."%'"." || pe.`DESCRIPCION` like "."'%".$f3->get('POST.termino')."%'"." || pe.`ANIO` like "."'%".$f3->get('POST.termino')."%'".") order by pe.FECHA_INI DESC";
-     
-        $resultado = mysqli_query($db_connection, $sql);
+         || pe.`MARCA` like "."'%".$f3->get('POST.termino')."%'"." || pe.`DESCRIPCION` like "."'%".$f3->get('POST.termino')."%'"." || pe.`ANIO` like "."'%".$f3->get('POST.termino')."%'".") order by pe.FECHA_INI DESC");
+         $f3->get('DB')->commit();
         $pedidos = array();
         $fotos = array();
         $respuesta = array();
-        while($row = mysqli_fetch_array($resultado)){
+        foreach ($resultado  as $row){
           
             
             $pedidos[] = $row; 
-
-            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
-            
-            $result = mysqli_query($db_connection, $sql);
-            if ($result->num_rows > 0) {
-                while($row1 = mysqli_fetch_array($result)){
+            $f3->get('DB')->begin();
+            $result = $f3->get('DB')->exec("SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'");
+            $f3->get('DB')->commit();
+            if ($result) {
+                foreach ($result  as $row1){
                     // echo $row2;                   
                      $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
                      $fotos[] = $row1;  
@@ -583,62 +489,6 @@ class Pedidos_Ctrl
       
        
     }
-
-    /*public function Listar_Pedidos_Enviados($f3)
-    {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
-        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA,propues.P_ORIGINAL,propues.P_ORIGINAL_COM,
-        propues.P_GENERICO,propues.P_GENERICO_COM,propues.P_ENVIO,propues.FACTURA as FAC_PROPUESTA,propues.ENVIO 
-        as ENV_PROPUESTA,pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
-        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
-        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
-         propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
-         propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
-         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
-         "."'".$f3->get('POST.id_proveedor')."'"." and (propues.ESTADO = 'Cotizado' or propues.ESTADO='Aceptado') and propues.ACEPT=0 order by pe.FECHA_INI DESC";
-        $resultado = mysqli_query($db_connection, $sql);
-        $pedidos = array();
-        $fotos = array();
-        $respuesta = array();
-        while($row = mysqli_fetch_array($resultado)){
-          
-            
-            $pedidos[] = $row; 
-
-            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
-            
-            $result = mysqli_query($db_connection, $sql);
-            if ($result->num_rows > 0) {
-                while($row1 = mysqli_fetch_array($result)){
-                    // echo $row2;                   
-                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
-                     $fotos[] = $row1;  
-                    }
-            }else{
-                $msg = 'Pedido encontrado pero no tiene fotos';
-            }
-            //array_push($row,array('fotos' => $fotos) );
-            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
-            $pedidos = [];
-            $fotos=[];
-            
-        }
-        echo json_encode($respuesta);
-   
-    }*/
 
     public function Listar_Pedidos_Enviados($f3)
     {
@@ -675,62 +525,6 @@ class Pedidos_Ctrl
         }
         echo json_encode($respuesta);
     }
-
-   /* public function Listar_Pedidos_Aceptados($f3)
-    {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
-
-        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
-        pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, pe.ESTADO,pe.FECHA_FIN,
-        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, propues.P_ORIGINAL, propues.P_ORIGINAL_COM FROM `proveedor` as pro INNER JOIN
-         propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
-         propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
-         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
-         "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Aceptado' and propues.ACEPT=1 order by pe.FECHA_INI DESC";
-        
-        $resultado = mysqli_query($db_connection, $sql);
-        $pedidos = array();
-        $fotos = array();
-        $respuesta = array();
-        while($row = mysqli_fetch_array($resultado)){
-          
-            $pedidos[] = $row; 
-
-            $sql = "SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'";
-            
-            $result = mysqli_query($db_connection, $sql);
-            if ($result->num_rows > 0) {
-                while($row1 = mysqli_fetch_array($result)){
-                    // echo $row2;                   
-                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
-                     $fotos[] = $row1;  
-                    }
-            }else{
-                $msg = 'Pedido encontrado pero no tiene fotos';
-            }
-            //array_push($row,array('fotos' => $fotos) );
-            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
-            $pedidos = [];
-            $fotos=[];
-            
-        }
-        echo json_encode($respuesta);
-      
-       
-    }*/
 
     public function Listar_Pedidos_Aceptados($f3)
     {
@@ -769,30 +563,15 @@ class Pedidos_Ctrl
 
     public function Listar_Pedidos_Finalizados($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-
+       
         $fecha_inicial= new DateTime();
         $fecha_inicial->modify('first day of this month');
         $fecha_final= new DateTime();
         $fecha_final->modify('last day of this month');
         $respuesta = array();
 
-                
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
-
-
-        $sql = "SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
+        $f3->get('DB')->begin();
+        $resultado = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
         pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, pe.ESTADO,pe.FECHA_FIN,
         ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, propues.P_ORIGINAL, propues.P_ORIGINAL_COM FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
@@ -800,10 +579,10 @@ class Pedidos_Ctrl
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
          "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Aceptado' and propues.ACEPT=1 and 
          pe.FECHA_FIN BETWEEN "."'".$fecha_inicial->format('Y-m-d')."'"." AND "."'".$fecha_final->format('Y-m-d')."'"." 
-         order by pe.FECHA_INI DESC";
-        $resultado = mysqli_query($db_connection, $sql);
+         order by pe.FECHA_INI DESC");
+         $f3->get('DB')->commit();
         $pedidos = array();
-        while($row = mysqli_fetch_array($resultado)){
+        foreach ($resultado  as $row){
                 
             $pedidos[] = $row; 
             
@@ -816,42 +595,34 @@ class Pedidos_Ctrl
 
     public function consultar_Pedido($f3)
     {
-        $db_host="localhost";
-        $db_user="root";
-        $db_password="";
-        $db_name="repicar";
-        
-        // Create connection
-        $db_connection = new mysqli($db_host, $db_user, $db_password, $db_name);
-    
-        mysqli_set_charset($db_connection, 'utf8');
-        
-        // Check connection
-        if ($db_connection->connect_error) {
-        die("Connection failed: " . $db_connection->connect_error);
-        }
-
-        $sql = "SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
+        $respuesta = array();
+        $f3->get('DB')->begin();
+        $resultado = $f3->get('DB')->exec("SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
         p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV,propu.ID_PROPUESTA,propu.CI_RUC,propu.ESTADO 
         FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
         as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA INNER JOIN propuesta as propu on p.COD_PEDIDO = propu.COD_PEDIDO
-         WHERE  p.`COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'"." and propu.CI_RUC="."'".$f3->get('POST.id_proveedor')."'"." and propu.ESTADO='Aceptado' and propu.ACEPT=0";
-        $resultado = mysqli_query($db_connection, $sql);
-        $fila= mysqli_fetch_array ($resultado);
-        if ($resultado->num_rows > 0) {
+         WHERE  p.`COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'"." and propu.CI_RUC="."'".$f3->get('POST.id_proveedor')."'"." and propu.ESTADO='Aceptado' and propu.ACEPT=0");
+         $f3->get('DB')->commit();
+        $fila= $resultado;
+        if ($resultado) {
+            foreach ($resultado  as $row)
+        {
+            $f3->get('DB')->begin();
+            $sql0 = $f3->get('DB')->exec("UPDATE `propuesta` SET `ESTADO`='Eliminado' WHERE `COD_PEDIDO`=".'"'.$row["COD_PEDIDO"].'"');
+            $sql1 = $f3->get('DB')->exec("UPDATE `propuesta` SET `ESTADO`='Aceptado',`ACEPT`=1,`FECHA_FIN`=".'"'.$this->fecha_fin.'"'." WHERE `ID_PROPUESTA`=".$row["ID_PROPUESTA"]);
+            $sql2 = $f3->get('DB')->exec("UPDATE `pedidos` SET `ESTADO`='Finalizado',`FECHA_FIN`=".'"'.$this->fecha_fin.'"'." WHERE `COD_PEDIDO`=".'"'.$row["COD_PEDIDO"].'"');
+            $f3->get('DB')->commit();
            
-            $sql0="UPDATE `propuesta` SET `ESTADO`='Eliminado' WHERE `COD_PEDIDO`=".'"'.$fila["COD_PEDIDO"].'"';
-            $resultado0 = mysqli_query($db_connection, $sql0);
-           
-            $sql1="UPDATE `propuesta` SET `ESTADO`='Aceptado',`ACEPT`=1,`FECHA_FIN`=".'"'.$this->fecha_fin.'"'." WHERE `ID_PROPUESTA`=".$fila["ID_PROPUESTA"];
-            $resultado1 = mysqli_query($db_connection, $sql1);
-            $sql2="UPDATE `pedidos` SET `ESTADO`='Finalizado',`FECHA_FIN`=".'"'.$this->fecha_fin.'"'." WHERE `COD_PEDIDO`=".'"'.$fila["COD_PEDIDO"].'"';
-            $resultado2 = mysqli_query($db_connection, $sql2);
-            
+        }   
+            $result = 'true';
+            $msg = 'Operacion correcta';   
 
         }else{
-            $msg = 'Pedido no exites';
+            $result = 'false';
+            $msg = 'El codigo del pedido no es el correcto, vuelva a ingresarlo';
         }
+        array_push($respuesta,array('result' => $result,'msg' => $msg) );
+        echo json_encode($respuesta);
 
         
         
