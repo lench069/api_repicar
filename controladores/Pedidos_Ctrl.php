@@ -9,6 +9,7 @@ class Pedidos_Ctrl
     public $M_Proveedor = null;
     public $M_Fotos = null;
     public $server = 'http://192.168.100.19:8080/api_repicar/';
+    //public $server = 'http://riobytes.com/api_repicar/';
     public $time;
     
 
