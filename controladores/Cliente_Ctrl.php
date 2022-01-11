@@ -81,6 +81,30 @@ class Cliente_Ctrl
         ]);
         
     }
+    public function actualizar_token($f3)
+    {
+        $id_cliente = $f3->get('PARAMS.id_cliente');
+        $this->M_Cliente->load(['ID_CLIENTE = ?',$id_cliente]);
+        $msg='';
+        $info = array();
+        if($this->M_Cliente->loaded() > 0)
+        {
+                $this->M_Cliente->set('TOKEN', $f3->get('POST.token'));
+                $this->M_Cliente->save();
+                $msg = 'token fue actualizado';
+                $info['id'] = $this->M_Cliente->get('ID_CLIENTE');
+        }else
+        {
+            $msg = 'NO se actualizo el token';
+            $info['id'] = 0;
+
+        }
+        echo json_encode([
+            'mensaje' => $msg,           
+            'info' => $info
+        ]);
+        
+    }
     public function Guardar_Imagen($contenido)
     {
         $nombre_imagen = '';
@@ -125,5 +149,21 @@ class Cliente_Ctrl
             ]
         ]);
         
+    }
+    public function Push_Notificacion($f3)
+    {
+        $id_cliente = $f3->get('PARAMS.id_cliente');
+        $this->M_Cliente->load(['ID_CLIENTE = ?',10]);
+        $msg='';
+        $item = array();
+        $item = $this->M_Cliente->cast();
+        $r = Push::android(['mtitle' => "Nueva propuesta", 'mdesc' => "Tiene una propuesta para el pidido AFSFGGHGA " . date("Y-m-d H:i:s")], 
+        $item['TOKEN']);      
+        if($r){
+            echo 'push enviada';
+        }else{
+            echo 'error al enviar push';
+        }
+
     }
 }

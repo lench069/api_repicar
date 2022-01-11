@@ -329,11 +329,13 @@ class Pedidos_Ctrl
 
         $resultado = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
         pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, 
-        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA FROM `proveedor` as pro INNER JOIN
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, cli.ID_CLIENTE,
+        cli.TOKEN FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
-         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
+         INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA INNER JOIN cliente as cli on pe.ID_CLIENTE=cli.ID_CLIENTE WHERE pro.`CI_RUC`=
          "."'".$f3->get('POST.id_proveedor')."'"." and propues.ESTADO = 'Creado' order by pe.FECHA_INI DESC");
+        // echo $f3->get('DB')->log();
         $f3->get('DB')->commit();
         $pedidos = array();
         $fotos = array();
