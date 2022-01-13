@@ -1,6 +1,6 @@
 <?php
 
-class Datos_Factura_Ctrl
+class Datos_Envio_Ctrl
 {
     public $M_Datos_Envio = null;
 
@@ -24,5 +24,26 @@ class Datos_Factura_Ctrl
                 ]
             ]);
             
+    }
+    public function consultar_datosEnv($f3)
+    {
+        $id_cliente = $f3->get('PARAMS.id_cliente');
+        $this->M_Datos_Envio->load(['ID_CLIENTE = ?',$id_cliente]);
+        $msg='';
+        $item = array();
+        if($this->M_Datos_Envio->loaded() > 0)
+        {
+            $msg = 'Datos de envio encontrado';
+            $item = $this->M_Datos_Envio->cast();
+        }else
+        {
+            $msg = 'No tiene datos de envio';
+
+        }
+        echo json_encode([
+            'mensaje' => $msg,
+            'item'=>$item
+        ]);
+        
     }
 }

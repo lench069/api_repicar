@@ -49,24 +49,53 @@ class Pedidos_Ctrl
         //Insertar datos de factura
             if($f3->get('POST.factura') == '1')
             {   
-                $this->M_Datos_Factura->set('ID_CLIENTE', $f3->get('POST.id_cliente'));
-                $this->M_Datos_Factura->set('NOMBRES', $f3->get('POST.nombres'));
-                $this->M_Datos_Factura->set('EMAIL', $f3->get('POST.email'));
-                $this->M_Datos_Factura->set('TELEFONO', $f3->get('POST.telefono'));
-                $this->M_Datos_Factura->set('CI', $f3->get('POST.ci'));
-                $this->M_Datos_Factura->set('DIRECCION', $f3->get('POST.direccion'));
-                $this->M_Datos_Factura->save();
+                $this->M_Datos_Factura->load(['ID_CLIENTE = ?',$f3->get('POST.id_cliente')]);
+                if($this->M_Datos_Factura->loaded() > 0)
+                {
+                    $this->M_Datos_Factura->set('ID_CLIENTE', $f3->get('POST.id_cliente'));
+                    $this->M_Datos_Factura->set('NOMBRES', $f3->get('POST.nombres'));
+                    $this->M_Datos_Factura->set('EMAIL', $f3->get('POST.email'));
+                    $this->M_Datos_Factura->set('TELEFONO', $f3->get('POST.telefono'));
+                    $this->M_Datos_Factura->set('CI', $f3->get('POST.ci'));
+                    $this->M_Datos_Factura->set('DIRECCION', $f3->get('POST.direccion'));
+                    $this->M_Datos_Factura->save();
+                }else{
+                    //reset model datos factura
+                    $this->M_Datos_Factura->reset();
+                    $this->M_Datos_Factura->set('ID_CLIENTE', $f3->get('POST.id_cliente'));
+                    $this->M_Datos_Factura->set('NOMBRES', $f3->get('POST.nombres'));
+                    $this->M_Datos_Factura->set('EMAIL', $f3->get('POST.email'));
+                    $this->M_Datos_Factura->set('TELEFONO', $f3->get('POST.telefono'));
+                    $this->M_Datos_Factura->set('CI', $f3->get('POST.ci'));
+                    $this->M_Datos_Factura->set('DIRECCION', $f3->get('POST.direccion'));
+                    $this->M_Datos_Factura->save();
+                }
+
+                
                 
             }
         //Insertar datos de envio
             if($f3->get('POST.servicio_env') == '1')
             {
-                $this->M_Datos_Envio->set('ID_CLIENTE', $f3->get('POST.id_cliente'));
-                $this->M_Datos_Envio->set('CALL_PRINCIPAL', $f3->get('POST.call_principal'));
-                $this->M_Datos_Envio->set('CALL_SECUNDARIA', $f3->get('POST.call_secundaria'));
-                $this->M_Datos_Envio->set('TELEFONO', $f3->get('POST.telefono_env'));
-                $this->M_Datos_Envio->set('REFERENCIA', $f3->get('POST.referencia'));
-                $this->M_Datos_Envio->save(); 
+                $this->M_Datos_Envio->load(['ID_CLIENTE = ?',$f3->get('POST.id_cliente')]);
+                if($this->M_Datos_Envio->loaded() > 0)
+                {
+                    $this->M_Datos_Envio->set('ID_CLIENTE', $f3->get('POST.id_cliente'));
+                    $this->M_Datos_Envio->set('CALL_PRINCIPAL', $f3->get('POST.call_principal'));
+                    $this->M_Datos_Envio->set('CALL_SECUNDARIA', $f3->get('POST.call_secundaria'));
+                    $this->M_Datos_Envio->set('TELEFONO', $f3->get('POST.telefono_env'));
+                    $this->M_Datos_Envio->set('REFERENCIA', $f3->get('POST.referencia'));
+                    $this->M_Datos_Envio->save(); 
+                }else{
+                    $this->M_Datos_Envio->reset();
+                    $this->M_Datos_Envio->set('ID_CLIENTE', $f3->get('POST.id_cliente'));
+                    $this->M_Datos_Envio->set('CALL_PRINCIPAL', $f3->get('POST.call_principal'));
+                    $this->M_Datos_Envio->set('CALL_SECUNDARIA', $f3->get('POST.call_secundaria'));
+                    $this->M_Datos_Envio->set('TELEFONO', $f3->get('POST.telefono_env'));
+                    $this->M_Datos_Envio->set('REFERENCIA', $f3->get('POST.referencia'));
+                    $this->M_Datos_Envio->save(); 
+                }
+               
             }
  //Creacion de Propuestas
             $result = $this->M_Proveedor->find(['ID_CIUDAD_F = ? AND ESTADO = ?', $f3->get('POST.id_ciudad'), 2]);
