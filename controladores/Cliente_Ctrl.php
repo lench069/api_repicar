@@ -153,7 +153,7 @@ class Cliente_Ctrl
     public function Push_Notificacion($f3)
     {
         
-        $r = Push::android(['mtitle' =>$f3->get('POST.titulo'), 'mdesc' => $f3->get('POST.desc')],$f3->get('POST.token'));      
+        $r = Push::android(['mtitle' =>$f3->get('POST.titulo'), 'mdesc' => $f3->get('POST.desc'),'COD' => $f3->get('POST.cod_pedido')],$f3->get('POST.token'));      
         if($r){
             echo 'push enviada';
         }else{

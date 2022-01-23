@@ -286,16 +286,16 @@ class Pedidos_Ctrl
            p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV 
            FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
            as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and ESTADO='Finalizado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente'));
-           //echo $sql;
+           // echo $f3->get('DB')->log();
            $f3->get('DB')->commit();
             $row2= array();
             foreach ($resultado1  as $row2)
             {
                // echo $row2;
-                $pedidos[] = $row2;
+                $notificaciones[] = $row2;
                 
             }
-            array_push($total,array('fecha' => $fecha,'cantidad' => $cantidad, 'items' =>$pedidos) );
+            array_push($total,array('fecha' => $fecha,'cantidad' => $cantidad, 'items' =>$notificaciones) );
         
         };
         echo json_encode($total);

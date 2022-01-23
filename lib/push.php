@@ -19,6 +19,7 @@ class Push
             'msgcnt' => 1,
             'vibrate' => 1,
             'sound' =>  "default",
+            'cod_pedido' => $data['COD']
         );
 
         $message = array_merge($message, $data);
