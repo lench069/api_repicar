@@ -4,6 +4,7 @@ class Cliente_Ctrl
 {
     public $M_Cliente = null;
     public $server = 'http://192.168.100.19:8080/api_repicar/';
+    //public $server = 'http://riobytes.com/api_repicar/';
     public function __construct()
     {
         $this->M_Cliente = new M_Cliente();
@@ -19,7 +20,9 @@ class Cliente_Ctrl
             $this->M_Cliente->set('CONTRASENIA', $f3->get('POST.contrasenia'));
             $this->M_Cliente->set('ESTADO', $f3->get('POST.estado'));
             $this->M_Cliente->set('FOTO', $this->Guardar_Imagen($f3->get('POST.foto')));
+            $this->M_Cliente->set('TOKEN', $f3->get('POST.token'));
             $this->M_Cliente->save();
+           // echo $f3->get('DB')->log();
             echo json_encode([
                 'mensaje' => 'Cliente creado',
                 'info' =>[
