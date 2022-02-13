@@ -563,7 +563,8 @@ class Pedidos_Ctrl
         $resultado = array();   
         $resultado  = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
         pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, pe.ESTADO,pe.FECHA_FIN,
-        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, propues.P_ORIGINAL, propues.P_ORIGINAL_COM FROM `proveedor` as pro INNER JOIN
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, propues.P_ORIGINAL, propues.P_ORIGINAL_COM,propues.P_GENERICO, propues.P_GENERICO_COM,
+        propues.P_ENVIO,propues.FACTURA as FAC_PROPUESTA,propues.ENVIO as ENV_PROPUESTA FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
@@ -605,7 +606,8 @@ class Pedidos_Ctrl
         $f3->get('DB')->begin();
         $resultado = $f3->get('DB')->exec("SELECT propues.CI_RUC,propues.COD_PEDIDO,propues.ID_PROPUESTA, pe.TIPO_VEHICULO,pe.MARCA,pe.MODELO,pe.ANIO,
         pe.DESCRIPCION,pe.ORIGINAL,pe.GENERICO,pe.FACTURA,pe.SERVICIO_ENV,pe.ESTADO,pe.FECHA_INI, pe.ESTADO,pe.FECHA_FIN,
-        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, propues.P_ORIGINAL, propues.P_ORIGINAL_COM FROM `proveedor` as pro INNER JOIN
+        ci.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVINCIA, propues.ESTADO,propues.P_ORIGINAL, propues.P_ORIGINAL_COM,propues.P_GENERICO, propues.P_GENERICO_COM,
+        propues.P_ENVIO,propues.FACTURA as FAC_PROPUESTA,propu.ENVIO as ENV_PROPUESTA FROM `proveedor` as pro INNER JOIN
          propuesta as propues on pro.ci_ruc = propues.CI_RUC INNER JOIN pedidos as pe on 
          propues.COD_PEDIDO=pe.COD_PEDIDO INNER JOIN ciudad as ci on pro.`ID_CIUDAD_F`=ci.ID_CIUDAD 
          INNER JOIN provincia as provin on ci.ID_PROVINCIA=provin.ID_PROVINCIA WHERE pro.`CI_RUC`=
@@ -626,6 +628,41 @@ class Pedidos_Ctrl
     }
 
     public function consultar_Pedido($f3)
+    {
+  
+        $f3->get('DB')->begin();
+        $resultado = $f3->get('DB')->exec("SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
+        p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV,propu.ID_PROPUESTA,propu.CI_RUC,propu.ESTADO,propu.P_ORIGINAL, propu.P_ORIGINAL_COM,propu.P_GENERICO, propu.P_GENERICO_COM,
+        propu.P_ENVIO,propu.FACTURA as FAC_PROPUESTA,propu.ENVIO as ENV_PROPUESTA 
+        FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
+        as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA INNER JOIN propuesta as propu on p.COD_PEDIDO = propu.COD_PEDIDO
+         WHERE  p.`COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'"." and propu.CI_RUC="."'".$f3->get('POST.id_proveedor')."'"." and propu.ESTADO='Aceptado' and propu.ACEPT=0");
+         $f3->get('DB')->commit();
+         //echo $f3->get('DB')->log();
+        $pedidos = array();
+        $fotos = array();
+        $respuesta = array();
+        foreach ($resultado  as $row) {
+            $pedidos[] = $row; 
+            $result =  $f3->get('DB')->exec("SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$row["COD_PEDIDO"]."'");
+            if (count($resultado) > 0) {        
+                    foreach ($result  as $row1){
+                    // echo $row2;                   
+                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
+                     $fotos[] = $row1;  
+                    }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene fotos';
+            }
+            //array_push($row,array('fotos' => $fotos) );
+            array_push($respuesta,array('pedidos' => $pedidos,'fotos' => $fotos) );
+            $pedidos = [];
+            $fotos=[];
+        }
+        echo json_encode($respuesta);
+    }
+
+    public function finalizar_Pedido($f3)
     {
         $respuesta = array();
         $f3->get('DB')->begin();
