@@ -21,6 +21,8 @@ class Cliente_Ctrl
             $this->M_Cliente->set('ESTADO', $f3->get('POST.estado'));
             $this->M_Cliente->set('FOTO', $this->Guardar_Imagen($f3->get('POST.foto')));
             $this->M_Cliente->set('TOKEN', $f3->get('POST.token'));
+            $this->M_Cliente->set('UIDD', $f3->get('POST.uidd'));
+            $this->M_Cliente->set('LOGIN', $f3->get('POST.login'));
             $this->M_Cliente->save();
            // echo $f3->get('DB')->log();
             echo json_encode([
@@ -99,6 +101,31 @@ class Cliente_Ctrl
         }else
         {
             $msg = 'NO se actualizo el token';
+            $info['id'] = 0;
+
+        }
+        echo json_encode([
+            'mensaje' => $msg,           
+            'info' => $info
+        ]);
+        
+    }
+
+    public function actualizar_login($f3)
+    {
+        $id_cliente = $f3->get('PARAMS.id_cliente');
+        $this->M_Cliente->load(['ID_CLIENTE = ?',$id_cliente]);
+        $msg='';
+        $info = array();
+        if($this->M_Cliente->loaded() > 0)
+        {
+                $this->M_Cliente->set('LOGIN', $f3->get('POST.login'));
+                $this->M_Cliente->save();
+                $msg = 'login fue actualizado';
+                $info['id'] = $this->M_Cliente->get('ID_CLIENTE');
+        }else
+        {
+            $msg = 'NO se actualizo el login';
             $info['id'] = 0;
 
         }
