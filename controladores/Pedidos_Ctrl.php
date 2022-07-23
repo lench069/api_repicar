@@ -311,7 +311,7 @@ class Pedidos_Ctrl
         FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
         as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE  `COD_PEDIDO` ="."'".$f3->get('PARAMS.cod_pedido')."'");
         $f3->get('DB')->commit();
-
+        //echo $f3->get('DB')->log();
         $pedido = array();
         $propuesta = array();
         if ($resultado) {
@@ -321,13 +321,13 @@ class Pedidos_Ctrl
             $f3->get('DB')->begin();
             $result = $f3->get('DB')->exec("SELECT pro.CI_RUC,pro.COD_PEDIDO,pro.P_ORIGINAL,pro.P_GENERICO,pro.FACTURA,pro.ENVIO,
             pro.ESTADO,pro.NOTIFICACION,pro.ID_PROPUESTA,pro.FECHA_INI,prove.NOMBRES as NOMBRE_PROVEE,
-            prove.NOMBRE_LOCAL,prove.DIRECCION,prove.SECTOR, 
+            prove.NOMBRE_LOCAL,prove.DIRECCION,prove.SECTOR,prove.TELEFONO as TEL_PROVEE, prove.EMAIL as EMAIL_PROVEE, 
             c.NOMBRE as NOMBRE_CIUDAD, provin.NOMBRE as NOMBRE_PROVIN FROM `propuesta` as pro INNER JOIN 
             proveedor as prove on pro.`CI_RUC` = prove.CI_RUC INNER JOIN ciudad as c on 
             prove.ID_CIUDAD_F=c.ID_CIUDAD INNER JOIN provincia as provin ON c.ID_PROVINCIA=provin.ID_PROVINCIA
              WHERE `COD_PEDIDO` = "."'".$f3->get('PARAMS.cod_pedido')."'"."and (pro.ESTADO='Cotizado' or pro.ESTADO='Aceptado') order by pro.FECHA_INI desc") ;
             $f3->get('DB')->commit();
-
+            //echo $f3->get('DB')->log();
             if ($result) {
                 foreach ($result  as $row)
                 {
