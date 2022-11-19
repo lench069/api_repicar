@@ -34,6 +34,7 @@ class Notificaciones_Ctrl
         $f3->get('DB')->begin();
         $resultado = $f3->get('DB')->exec("SELECT * FROM `notificaciones` WHERE `ID_CLIENTE` = $id_cliente and `ESTADO` = 0");
         $f3->get('DB')->commit();
+        $notificaciones_new = array();
         foreach ($resultado  as $row)
         {             
             $notificaciones_new[] = $row;   
@@ -45,7 +46,7 @@ class Notificaciones_Ctrl
     public function Cargar_notificaciones($f3)
     {
         $f3->get('DB')->begin();
-        $resultado = $f3->get('DB')->exec("SELECT SUBSTRING(`FECHA`,1,10) as FECHA_NOTI,COUNT(`FECHA`) as num FROM `notificaciones` where ESTADO='0' and 
+        $resultado = $f3->get('DB')->exec("SELECT SUBSTRING(`FECHA`,1,10) as FECHA_NOTI,COUNT(`FECHA`) as num FROM `notificaciones` where  
         `ID_CLIENTE` =". $f3->get('POST.id_cliente')." GROUP by FECHA_NOTI ORDER by `FECHA` desc");          
         //echo $f3->get('DB')->log();
         $f3->get('DB')->commit();

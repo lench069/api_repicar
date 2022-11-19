@@ -41,7 +41,7 @@ class Proveedor_Ctrl
                         $mensaje = 'esto es una prueba';
                 
                         $email_user = "inforepicar@gmail.com";
-                        $email_password = "apprepicarinfo";
+                        $email_password = "zlwlvmwmavlyivip";
                         $the_subject = $asunto;
                         $address_to = $f3->get('POST.email'); //AQUI CAMBIAR EL CORREO AL QUE QUIEES QUE TE LLEGUEN LOS CORREOS
                         $from_name = $nombre;
@@ -346,7 +346,7 @@ public function verificar_cambio_contrasenia($f3)
         $asunto = $asuntop;
 
         $email_user = "inforepicar@gmail.com";
-        $email_password = "apprepicarinfo";
+        $email_password = "zlwlvmwmavlyivip";
         $the_subject = $asunto;
         $address_to = $correo; //AQUI CAMBIAR EL CORREO AL QUE QUIEES QUE TE LLEGUEN LOS CORREOS
         $from_name = $nombre;
@@ -436,7 +436,7 @@ Visítanos en la página oficial (Repicar.com) o en nuestra página de Facebook
         $asunto = 'Pregunta de cliente';
 
         $email_user = "inforepicar@gmail.com";
-        $email_password = "apprepicarinfo";
+        $email_password = "zlwlvmwmavlyivip";
         $the_subject = $asunto;
         $address_to = $mail; //AQUI CAMBIAR EL CORREO AL QUE QUIEES QUE TE LLEGUEN LOS CORREOS
         $from_name = $nombre;

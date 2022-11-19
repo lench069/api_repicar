@@ -314,6 +314,7 @@ class Pedidos_Ctrl
         //echo $f3->get('DB')->log();
         $pedido = array();
         $propuesta = array();
+        $fotos = array();
         if ($resultado) {
             $msg = 'Pedido encontrado';
              // output data of each row
@@ -338,6 +339,20 @@ class Pedidos_Ctrl
                 $msg = 'Pedido encontrado pero no tiene propuestas';
             }
 
+            
+            $f3->get('DB')->begin();
+            $result = $f3->get('DB')->exec("SELECT * FROM `fotos` WHERE `COD_PEDIDO` ="."'".$pedido["COD_PEDIDO"]."'");
+            $f3->get('DB')->commit();
+            if ($result) {
+                foreach ($result as $row1){
+                    // echo $row2;                   
+                     $row1['IMAGEN'] = !empty($row1['IMAGEN']) ? $this->server . $row1['IMAGEN'] : 'http://via.placeholder.com/300x300';
+                     $fotos[] = $row1;  
+                    }
+            }else{
+                $msg = 'Pedido encontrado pero no tiene fotos';
+            }
+
         }else{
             $msg = 'Pedido no exites';
         }
@@ -346,7 +361,8 @@ class Pedidos_Ctrl
             'mensaje' => $msg,
            
                 'pedido' => $pedido,
-                'propuestas' => $propuesta
+                'propuestas' => $propuesta,
+                'fotos' => $fotos
 
         ]);
         

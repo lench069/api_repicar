@@ -3,7 +3,7 @@
 class Cliente_Ctrl
 {
     public $M_Cliente = null;
-    public $server = 'http://192.168.100.19:8080/api_repicar/';
+    public $server = 'http://192.168.100.94/api_repicar/';
     //public $server = 'http://riobytes.com/api_repicar/';
     public function __construct()
     {
