@@ -19,7 +19,7 @@ class Propuesta_Ctrl
         $info = array();
         if($this->M_Propuesta->loaded() > 0)
         {
-               $this->M_Propuesta->set('ESTADO', $f3->get('POST.estado'));
+                $this->M_Propuesta->set('ESTADO', $f3->get('POST.estado'));
                 $this->M_Propuesta->set('P_ORIGINAL', $f3->get('POST.p_original'));
                 $this->M_Propuesta->set('P_GENERICO', $f3->get('POST.p_generico'));  
                 $this->M_Propuesta->set('P_ENVIO', $f3->get('POST.p_envio'));  
@@ -36,12 +36,24 @@ class Propuesta_Ctrl
                 {
                     $this->M_Propuesta->set('ENVIO', true);
                 }else{
-                    $this->M_Propuesta->set('ENVIO', false);
+                    $this->M_Propuesta->set('ENVIO', true);
                 }
                 $this->M_Propuesta->set('FECHA_INI', $this->fecha_ini);  
-                $this->M_Propuesta->save();
-                $msg = 'Propuesta fue cotizada';
-                $info['id'] = $this->M_Propuesta->get('ID_PROPUESTA');
+                if ($this->M_Propuesta->save()){
+                    //$this->M_Pedidos= new M_Pedidos();
+                    $ID_PEDIDO =  $this->M_Propuesta->get('COD_PEDIDO');
+                    $this->M_Pedidos= new M_Pedidos();
+                    $this->M_Pedidos->load(['COD_PEDIDO = ?',$ID_PEDIDO]);
+                    if($this->M_Pedidos->loaded() > 0)
+                     {
+                        $this->M_Pedidos->set('ESTADO', 'Cotizado');
+                        $this->M_Pedidos->save();
+                     }
+                     $msg = 'Propuesta fue cotizada';
+                    $info['id'] = $this->M_Propuesta->get('ID_PROPUESTA');
+
+                }
+               
         }else
         {
             $msg = 'La propuesta no existe';
@@ -100,9 +112,21 @@ class Propuesta_Ctrl
                 $this->M_Propuesta->set('FECHA_FIN', $this->fecha_fin);  
                 if($this->M_Propuesta->save())
                 {
+                    //CAMBIA A ESTADO ELIMINADO A LAS PROPUESTA NO ACEPTADAS
                     $resultado  = $f3->get('DB')->exec("UPDATE `propuesta` SET `ESTADO`='Eliminado',
                     `FECHA_FIN`="."'".$this->fecha_fin."'"." WHERE `COD_PEDIDO` ="."'".$f3->get('POST.cod_pedido')."'"." AND
                     ID_PROPUESTA <>".$this->M_Propuesta->get('ID_PROPUESTA'));
+
+                    //ACTUALIZA EL ESTADO DEL PEDIDO 
+                    $ID_PEDIDO =  $this->M_Propuesta->get('COD_PEDIDO');
+                    //echo $this->M_Propuesta->get('COD_PEDIDO');
+                    $this->M_Pedidos= new M_Pedidos();
+                    $this->M_Pedidos->load(['COD_PEDIDO = ?',$ID_PEDIDO]);
+                    if($this->M_Pedidos->loaded() > 0)
+                     {
+                        $this->M_Pedidos->set('ESTADO', 'Pre-Finalizado');
+                        $this->M_Pedidos->save();
+                     }
                    // echo $f3->get('DB')->log();
                     $msg = 'Propuesta fue aceptada';
                     $info['id'] = $this->M_Propuesta->get('ID_PROPUESTA');

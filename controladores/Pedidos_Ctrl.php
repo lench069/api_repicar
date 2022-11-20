@@ -222,7 +222,7 @@ class Pedidos_Ctrl
        
         $f3->get('DB')->begin();
         $resultado = $f3->get('DB')->exec("SELECT SUBSTRING(`FECHA_INI`,1,10) as FECHA_INICIAL,COUNT(`FECHA_INI`) as num
-        FROM `pedidos` where `ID_CLIENTE` =". $f3->get('POST.id_cliente')." and ESTADO='Creado' GROUP by FECHA_INICIAL ORDER by `FECHA_INI` desc");
+        FROM `pedidos` where `ID_CLIENTE` =". $f3->get('POST.id_cliente')." and ESTADO!='Finalizado' GROUP by FECHA_INICIAL ORDER by `FECHA_INI` desc");
         $f3->get('DB')->commit();
         $fecha = '';
         $pedidos = array();
@@ -237,7 +237,7 @@ class Pedidos_Ctrl
            $resultado1= $f3->get('DB')->exec("SELECT p.COD_PEDIDO,p.`ID_CLIENTE`,p.`ANIO`,p.`DESCRIPCION`,p.TIPO_VEHICULO,p.MARCA,p.MODELO,p.`ORIGINAL`,p.`GENERICO`,
            p.`ESTADO`,p.`FECHA_INI`,p.`FECHA_FIN`,c.NOMBRE as NOMBRE_CIUDAD,pro.NOMBRE as NOMBRE_PROV 
            FROM `pedidos`as p INNER JOIN ciudad as c ON p.id_ciudad = c.ID_CIUDAD INNER JOIN provincia 
-           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and `ESTADO`='Creado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente')." ORDER BY FECHA_INI DESC");
+           as pro ON c.ID_PROVINCIA = pro.ID_PROVINCIA  WHERE `FECHA_INI` LIKE '".$fecha."%' and `ESTADO`!='Finalizado' and `ID_CLIENTE` =". $f3->get('POST.id_cliente')." ORDER BY FECHA_INI DESC");
             $f3->get('DB')->commit();
             $row2= array();
             foreach ($resultado1  as $row2)
