@@ -48,7 +48,7 @@ class Administradores_Ctrl
     {
         $proveedores = array();   
         $proveedores  = $f3->get('DB')->exec("SELECT * from administradores where `ID_ADMINISTRADOR` ="."'".$f3->get('PARAMS.cod_Administradores')."'");
-        echo $f3->get('DB')->log();
+        
         foreach ($proveedores  as $proveedor) {
             $items[] = $proveedor;
         }

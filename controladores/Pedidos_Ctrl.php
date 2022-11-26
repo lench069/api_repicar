@@ -736,5 +736,24 @@ class Pedidos_Ctrl
        
     }
 
+    public function borrar($f3)
+    {
+        $cod_pedido = $f3->get('PARAMS.cod_pedido');
+
+            $respuesta  = $f3->get('DB')->exec("DELETE FROM `pedidos` WHERE COD_PEDIDO = "."'".$cod_pedido."'"." and ESTADO in ('Creado','Cotizado')");
+           // echo $f3->get('DB')->log();
+            if($respuesta){
+                $msg = 'delete';
+            }else
+            {
+                $msg = 'no delete';
+
+            }
+        echo json_encode([
+            'mensaje' => $msg,        
+        ]);
+        
+    }
+
 
 }
