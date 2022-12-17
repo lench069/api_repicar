@@ -12,7 +12,16 @@ class Cliente_Ctrl
 
     public function registrar($f3)
     {
-            
+        $this->M_Cliente->load(['EMAIL = ? OR CELULAR = ?', $f3->get('POST.email'), $f3->get('POST.celular')]);
+        //echo $f3->get('DB')->log();
+        if ($this->M_Cliente->loaded() > 0) {
+            echo json_encode([
+                'mensaje' => 'Ya existe un usuario con el correo o calular que intenta registrar.',
+                'info' => [
+                    'id_cliente' => 0
+                ]
+            ]);
+        }else{
             $this->M_Cliente->set('NOMBRES', $f3->get('POST.nombres'));
             $this->M_Cliente->set('APELLIDOS', $f3->get('POST.apellidos'));
             $this->M_Cliente->set('EMAIL', $f3->get('POST.email'));
@@ -24,14 +33,14 @@ class Cliente_Ctrl
             $this->M_Cliente->set('UIDD', $f3->get('POST.uidd'));
             $this->M_Cliente->set('LOGIN', $f3->get('POST.login'));
             $this->M_Cliente->save();
-           // echo $f3->get('DB')->log();
+           
             echo json_encode([
                 'mensaje' => 'Cliente creado',
                 'info' =>[
-                    'id'=>$this->M_Cliente->get('ID_CLIENTE')
+                    'id_cliente'=>$this->M_Cliente->get('ID_CLIENTE')
                 ]
             ]);
-            
+        }                 
     }
     public function consultar($f3)
     {
