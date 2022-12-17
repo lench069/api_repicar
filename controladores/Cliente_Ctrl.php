@@ -52,7 +52,7 @@ class Cliente_Ctrl
         {
             $msg = 'Cliente encontrado';
             $item = $this->M_Cliente->cast();
-            $item['FOTO'] = !empty($item['FOTO']) ? $this->server . $item['FOTO'] : 'http://via.placeholder.com/300x300';
+            $item['FOTO'] = !empty($item['FOTO']) ? $this->server . $item['FOTO'] : $this->server . 'assets/images/user.png';
         }else
         {
             $msg = 'El Cliente no existe';
@@ -153,6 +153,8 @@ class Cliente_Ctrl
             $imagen = $contenido[1];
             $nombre_imagen = 'imagenes/'. time().'.jpg';
             file_put_contents($nombre_imagen,base64_decode($imagen));
+        }else{
+
         }
 
         return $nombre_imagen;
