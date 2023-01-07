@@ -153,12 +153,8 @@ class Cliente_Ctrl
             $imagen = $contenido[1];
             $nombre_imagen = 'imagenes/'. time().'.jpg';
             file_put_contents($nombre_imagen,base64_decode($imagen));
-        }else{
-
         }
-
-        return $nombre_imagen;
-        
+        return $nombre_imagen;   
     }
     public function login($f3)
     {

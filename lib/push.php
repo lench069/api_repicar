@@ -18,7 +18,7 @@ class Push
             'message' => $data['mdesc'],
             'msgcnt' => 1,
             'vibrate' => 1,
-            'sound' =>  "default",
+            'sound' =>  "car",
             'cod_pedido' => $data['COD']
         );
 
